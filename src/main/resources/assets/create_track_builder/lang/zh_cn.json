@@ -1,0 +1,18 @@
+{
+    "modname.create_track_builder": "机械动力：径工地点",
+
+    "block.create_track_builder.builder_block": "铁路修建器",
+
+    "tooltip.create_track_builder.1": "§7[使用方法]",
+    "tooltip.create_track_builder.2": "在机器上方放置路基方块（可以为木头、泥土或石头）",
+    "tooltip.create_track_builder.3": "路基方块上方放置列车轨道",
+    "tooltip.create_track_builder.4": "然后再设置终点位置",
+    "tooltip.create_track_builder.5": "最后使用坚固板潜行右键方块铺设铁路",
+    "tooltip.create_track_builder.6": "§7[注意]",
+    "tooltip.create_track_builder.7": "空手Shift + 右键切换铺设方向",
+    "tooltip.create_track_builder.8": "获取坐标时注意：如果你的坐标是正的，就向上取整，如果是负的，就向下取整，否则无法铺设铁轨就好玩了",
+
+    "message.create_track_builder.roadbed": "你需要在机器上方一个放置路基方块！",
+    "message.create_track_builder.track": "你需要在路基方块上方放置列车轨道！",
+    "message.create_track_builder.wrong_way": "不是合理的路线！"
+}

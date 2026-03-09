@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "create_track_builder:block/builder_block",
+      "y":90
+    },
+    "axis=z": {
+      "model": "create_track_builder:block/builder_block"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.shuangfa114.test.createtrackbuilder.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "createtrackbuilder.refmap.json",
+  "mixins": [
+    "PlacementInfoAccessor"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
