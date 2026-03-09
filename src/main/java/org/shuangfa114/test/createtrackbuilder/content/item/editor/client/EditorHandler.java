@@ -14,15 +14,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.shuangfa114.test.createtrackbuilder.ModPackets;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.client.tools.EditorToolType;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.Segment;
+import org.shuangfa114.test.createtrackbuilder.content.item.editor.packet.SegmentSyncPacket;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //I'm king of copying and pasting!!!!
 public class EditorHandler {
     private static final int SYNC_DELAY = 10;
+    public List<Segment> segments;
     private ToolSelectionScreen selectionScreen;
     private boolean initialized;
     private boolean active;
@@ -32,11 +36,11 @@ public class EditorHandler {
     private int syncCooldown;
     private AABBOutline startOutline;
     private ItemOutline startAxis;
-    private List<Segment> segmentList;
 
     public EditorHandler() {
         currentTool = EditorToolType.SELECTION_INIT;
         selectionScreen = new ToolSelectionScreen(ImmutableList.of(EditorToolType.SELECTION_INIT), this::equip);
+        segments = new ArrayList<>();
     }
 
     public void tick() {
@@ -64,10 +68,12 @@ public class EditorHandler {
     }
 
     public void render(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera) {
-        ms.pushPose();
-        currentTool.getTool().renderTool(ms, buffer, camera);
-        //ms.last().pose().setTranslation();
-        ms.popPose();
+        if(active){
+            ms.pushPose();
+            currentTool.getTool().renderTool(ms, buffer, camera);
+            //ms.last().pose().setTranslation();
+            ms.popPose();
+        }
     }
 
     public void renderGui(GuiGraphics graphics, float partialTicks, int width, int height) {
@@ -105,7 +111,7 @@ public class EditorHandler {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player.isShiftKeyDown())
             return false;
-        return currentTool.getTool().handleClick(button==0);
+        return currentTool.getTool().handleClick(button == 0);
     }
 
     public void onKeyInput(int key, boolean pressed) {
@@ -141,7 +147,9 @@ public class EditorHandler {
     }
 
     public void sync() {
-
+        if (this.getActiveEditorItem() == null)
+            return;
+        ModPackets.getChannel().sendToServer(new SegmentSyncPacket(segments, activeHotbarSlot));
     }
 
     public void equip(EditorToolType tool) {
@@ -161,11 +169,13 @@ public class EditorHandler {
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof TrackEditor))
             return null;
-        if (!stack.hasTag())
-            return null;
 
         activeEditorItem = stack;
         activeHotbarSlot = player.getInventory().selected;
         return stack;
+    }
+
+    public ItemStack getActiveEditorItem() {
+        return activeEditorItem;
     }
 }

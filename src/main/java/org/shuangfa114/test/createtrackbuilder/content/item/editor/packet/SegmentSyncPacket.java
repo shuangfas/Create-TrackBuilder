@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.Segment;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
 
 import java.util.List;
 

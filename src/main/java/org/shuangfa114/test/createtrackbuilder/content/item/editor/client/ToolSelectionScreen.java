@@ -38,6 +38,8 @@ public class ToolSelectionScreen extends Screen {
         yOffset = 0;
         selection = 0;
         initialized = false;
+
+        callback.accept(tools.get(selection));
         w = Math.max(tools.size() * 50 + 30, 220);
         h = 30;
     }

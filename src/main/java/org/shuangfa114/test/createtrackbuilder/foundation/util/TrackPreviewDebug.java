@@ -11,6 +11,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
 import org.shuangfa114.test.createtrackbuilder.foundation.events.ClientEvents;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
 import org.shuangfa114.test.createtrackbuilder.mixin.PlacementInfoAccessor;
 
 import static org.shuangfa114.test.createtrackbuilder.foundation.util.VisualUtil.linerAdd;

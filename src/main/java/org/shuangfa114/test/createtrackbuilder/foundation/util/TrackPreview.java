@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
 
 import java.util.ArrayList;
 import java.util.Collection;

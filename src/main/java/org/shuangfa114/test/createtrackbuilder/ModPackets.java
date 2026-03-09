@@ -1,6 +1,5 @@
 package org.shuangfa114.test.createtrackbuilder;
 
-import com.simibubi.create.Create;
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -8,14 +7,15 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
+import org.shuangfa114.test.createtrackbuilder.content.item.editor.packet.SegmentSyncPacket;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public enum ModPackets {
-    ;
-    public static final ResourceLocation CHANNEL_NAME = new ResourceLocation(CreateTrackBuilder.MODID, "channel");
+    SEGMENT_SYNC(SegmentSyncPacket.class, SegmentSyncPacket::new, NetworkDirection.PLAY_TO_SERVER);
+    public static final ResourceLocation CHANNEL_NAME = ResourceLocation.fromNamespaceAndPath(CreateTrackBuilder.MODID, "channel");
     public static final int NETWORK_VERSION = 3;
     public static final String NETWORK_VERSION_STR = String.valueOf(NETWORK_VERSION);
     private static SimpleChannel channel;

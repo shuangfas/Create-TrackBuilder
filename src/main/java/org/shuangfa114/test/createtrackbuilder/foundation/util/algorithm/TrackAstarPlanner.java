@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.foundation.util;
+package org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
@@ -173,5 +173,8 @@ public class TrackAstarPlanner {
             this.p2 = p2;
             this.q2 = q2;
         }
+    }
+    public static void main(String[] args) {//just for test
+
     }
 }

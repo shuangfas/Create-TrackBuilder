@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.foundation.util;
+package org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm;
 
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;

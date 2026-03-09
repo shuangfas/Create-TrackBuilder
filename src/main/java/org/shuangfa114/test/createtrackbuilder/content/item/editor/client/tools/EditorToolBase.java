@@ -23,7 +23,7 @@ public abstract class EditorToolBase implements IEditorTool {
 
     @Override
     public void init() {
-        editorHandler= CreateTrackBuilderClient.editorHandler;
+        editorHandler = CreateTrackBuilderClient.editorHandler;
     }
 
     @Override
