@@ -1,18 +1,4 @@
 {
-    "modname.create_track_builder": "Create: Auto Track",
+    "modname.create_track_builder": "Create: Auto Track"
 
-    "block.create_track_builder.builder_block": "Track Builder",
-
-    "tooltip.create_track_builder.1": "§7[Usage]",
-    "tooltip.create_track_builder.2": "Place roadbed blocks (e.g., wood, dirt, or stone) on top of the machine.",
-    "tooltip.create_track_builder.3": "Place train tracks on top of the roadbed blocks.",
-    "tooltip.create_track_builder.4": "Then set the destination coordinates.",
-    "tooltip.create_track_builder.5": "Finally, use a sturdy plate while sneaking to lay the track.",
-    "tooltip.create_track_builder.6": "§7[Note]",
-    "tooltip.create_track_builder.7": "Shift + Right-click (empty hand) to switch the laying direction.",
-    "tooltip.create_track_builder.8": "When setting coordinates: round up for positive values, round down for negative values, otherwise track laying might fail!",
-
-    "message.create_track_builder.roadbed": "You need to place a roadbed block above the machine!",
-    "message.create_track_builder.track": "You need to place train tracks above the roadbed block!",
-    "message.create_track_builder.wrong_way": "Invalid route!"
 }

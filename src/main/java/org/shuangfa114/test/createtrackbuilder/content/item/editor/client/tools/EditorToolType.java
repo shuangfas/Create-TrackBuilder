@@ -12,7 +12,7 @@ import java.util.List;
 
 public enum EditorToolType {
     SELECTION_INIT(new SelectionTool(),AllIcons.I_CENTERED),
-    NEW_SEGMENT(new NewSegmentTool(),AllIcons.I_ACTIVE);
+    SEGMENT_MOVE(new SegmentMoveTool(),AllIcons.I_ACTIVE);
     private IEditorTool tool;
     private AllIcons icon;
 
@@ -35,7 +35,7 @@ public enum EditorToolType {
 
     public static List<EditorToolType> getTools(boolean creative) {
         List<EditorToolType> tools = new ArrayList<>();
-        Collections.addAll(tools, NEW_SEGMENT);
+        Collections.addAll(tools, SEGMENT_MOVE);
 //        if (creative)
 //            tools.add(PRINT);
         return tools;

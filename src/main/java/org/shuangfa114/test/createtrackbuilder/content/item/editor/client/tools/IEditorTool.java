@@ -14,4 +14,6 @@ public interface IEditorTool {
     boolean handleMouseWheel(double delta);
 
     void renderTool(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera);
+
+    void tick();
 }

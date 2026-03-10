@@ -1,17 +1,21 @@
 package org.shuangfa114.test.createtrackbuilder.content.item.editor.client.tools;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.foundation.utility.RaycastHelper;
 import net.createmod.catnip.animation.AnimationTickHolder;
+import net.createmod.catnip.outliner.Outliner;
 import net.createmod.catnip.render.SuperRenderTypeBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.client.EditorHandler;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
 
 public abstract class EditorToolBase implements IEditorTool {
     protected BlockPos selectedPos;
@@ -78,5 +82,35 @@ public abstract class EditorToolBase implements IEditorTool {
     @Override
     public void renderTool(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera) {
 
+    }
+
+    @Override
+    public void tick() {
+        if (selectedPos != null && shouldShowSelection()) {
+            Outliner.getInstance().chaseAABB("editor_selection", getSelectionAABB())
+                    .lineWidth(1/16f)
+                    .colored(0x6886c5)
+                    .withFaceTextures(AllSpecialTextures.CHECKERED, AllSpecialTextures.HIGHLIGHT_CHECKERED);
+        }
+        Segment lastSeg = null;
+        //render selection
+        for (int i = 0; i < editorHandler.segments.size(); i++) {
+            Segment seg = editorHandler.segments.get(i);
+            if (i > 0) {
+                Outliner.getInstance().showLine("segmentConnection" + i, seg.pos.getCenter(), lastSeg.pos.getCenter());
+            }
+            Outliner.getInstance().showAABB("segment:" + seg.pos, new AABB(seg.pos))
+                    .colored(i == 0 || i == editorHandler.segments.size() - 1 ? 0xDAA520 : 0x6B8E23)
+                    .lineWidth(1 / 16f);
+            lastSeg = seg;
+        }
+    }
+
+    public boolean shouldShowSelection() {
+        return false;
+    }
+
+    public AABB getSelectionAABB() {
+        return new AABB(selectedPos);
     }
 }

@@ -23,8 +23,6 @@ import org.lwjgl.glfw.GLFW;
 import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilder;
 import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
 import org.shuangfa114.test.createtrackbuilder.foundation.blockEntity.behaviour.ItemPlacingRender;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.TrackPreview;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.TrackPreviewDebug;
 
 @Mod.EventBusSubscriber(modid = CreateTrackBuilder.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientEvents {
@@ -44,10 +42,9 @@ public class ClientEvents {
         if(event.phase == TickEvent.Phase.START) {
             return;
         }
-        TrackPreviewDebug.onClientTick(event);
         //ItemPreview.onClientTick(event);
         ItemPlacingRender.tick();
-        TrackPreview.clientTick();
+        //TrackPreview.clientTick();
         CreateTrackBuilderClient.editorHandler.tick();
     }
 

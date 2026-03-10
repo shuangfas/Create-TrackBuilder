@@ -3,21 +3,17 @@ package org.shuangfa114.test.createtrackbuilder.content.item.editor.client;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllKeys;
-import net.createmod.catnip.outliner.AABBOutline;
-import net.createmod.catnip.outliner.ItemOutline;
+import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.createmod.catnip.render.SuperRenderTypeBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.shuangfa114.test.createtrackbuilder.ModPackets;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.client.tools.EditorToolType;
-import org.shuangfa114.test.createtrackbuilder.content.item.editor.packet.SegmentSyncPacket;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
 
 import java.util.ArrayList;
@@ -33,9 +29,6 @@ public class EditorHandler {
     private EditorToolType currentTool;
     private int activeHotbarSlot;
     private ItemStack activeEditorItem;
-    private int syncCooldown;
-    private AABBOutline startOutline;
-    private ItemOutline startAxis;
 
     public EditorHandler() {
         currentTool = EditorToolType.SELECTION_INIT;
@@ -49,7 +42,6 @@ public class EditorHandler {
         ItemStack stack = findEditorInHand(player);
         if (stack == null) {
             active = false;
-            syncCooldown = 0;
             activeHotbarSlot = 0;
             activeEditorItem = null;
             return;
@@ -57,18 +49,13 @@ public class EditorHandler {
         if (!active) {
             init(player, stack);
         }
-        if (syncCooldown > 0) {
-            syncCooldown--;
-        }
-        if (syncCooldown == 1)
-            sync();
         selectionScreen.update();
-        currentTool.getTool()
-                .updateSelection();
+        currentTool.getTool().updateSelection();
+        currentTool.getTool().tick();
     }
 
     public void render(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera) {
-        if(active){
+        if (active) {
             ms.pushPose();
             currentTool.getTool().renderTool(ms, buffer, camera);
             //ms.last().pose().setTranslation();
@@ -91,11 +78,11 @@ public class EditorHandler {
 
     public void init(LocalPlayer player, ItemStack stack) {
         active = true;
-        startOutline = new AABBOutline(new AABB(new BlockPos(0, 0, 0)));
+        load(stack);
         if (initialized) {
             EditorToolType toolBefore = currentTool;
             selectionScreen = new ToolSelectionScreen(EditorToolType.getTools(player.isCreative()), this::equip);
-            if (toolBefore != null) {
+            if (toolBefore != null&&EditorToolType.getTools(player.isCreative()).contains(toolBefore)) {
                 selectionScreen.setSelectedElement(toolBefore);
                 equip(toolBefore);
             }
@@ -142,14 +129,10 @@ public class EditorHandler {
         return false;
     }
 
-    public void markDirty() {
-        syncCooldown = SYNC_DELAY;
-    }
-
-    public void sync() {
+    public void sync(SimplePacketBase packet) {
         if (this.getActiveEditorItem() == null)
             return;
-        ModPackets.getChannel().sendToServer(new SegmentSyncPacket(segments, activeHotbarSlot));
+        ModPackets.getChannel().sendToServer(packet);
     }
 
     public void equip(EditorToolType tool) {
@@ -177,5 +160,15 @@ public class EditorHandler {
 
     public ItemStack getActiveEditorItem() {
         return activeEditorItem;
+    }
+
+    public int getActiveHotbarSlot() {
+        return activeHotbarSlot;
+    }
+    public void load(ItemStack stack) {
+        if (segments.isEmpty()) {
+            segments = Segment.tagToList(stack.getOrCreateTag());
+        }
+        initialized = stack.getOrCreateTag().getBoolean("Initialized");
     }
 }

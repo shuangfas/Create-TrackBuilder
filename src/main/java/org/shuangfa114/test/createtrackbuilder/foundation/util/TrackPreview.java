@@ -278,7 +278,7 @@ public class TrackPreview {
         return info;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    /*@OnlyIn(Dist.CLIENT)
     public static void clientTick() {
         LocalPlayer player = Minecraft.getInstance().player;
         ItemStack stack = player.getMainHandItem();
@@ -412,7 +412,7 @@ public class TrackPreview {
         }
 
         lastLineCount = segCount;
-    }
+    }*/
 
     @OnlyIn(Dist.CLIENT)
     private static void line(int id, Vec3 v1, Vec3 o1, Vec3 ex, int color) {

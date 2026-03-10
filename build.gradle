@@ -171,6 +171,7 @@ dependencies {
         jarJar.ranged(it, "[0.5.3,)")
     }
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:15.20.0.129")
+    runtimeOnly fg.deobf("maven.modrinth:spark:4FXHDE9F")
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
