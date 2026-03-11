@@ -25,7 +25,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-//todo use "showItem" instead of "ItemValueBox"
 public class ItemPlacingRender {
     public static void tick() {
         Minecraft mc = Minecraft.getInstance();

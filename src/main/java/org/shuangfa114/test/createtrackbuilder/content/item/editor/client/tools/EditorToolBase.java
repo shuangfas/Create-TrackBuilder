@@ -21,13 +21,13 @@ public abstract class EditorToolBase implements IEditorTool {
     protected BlockPos selectedPos;
     protected Vec3 chasingSelectedPos;
     protected Vec3 lastChasingSelectedPos;
-    protected EditorHandler editorHandler;
+    protected EditorHandler handler;
     protected boolean selectIgnoreBlocks;
     protected int selectionRange;
 
     @Override
     public void init() {
-        editorHandler = CreateTrackBuilderClient.editorHandler;
+        handler = CreateTrackBuilderClient.editorHandler;
     }
 
     @Override
@@ -94,13 +94,13 @@ public abstract class EditorToolBase implements IEditorTool {
         }
         Segment lastSeg = null;
         //render selection
-        for (int i = 0; i < editorHandler.segments.size(); i++) {
-            Segment seg = editorHandler.segments.get(i);
+        for (int i = 0; i < handler.segments.size(); i++) {
+            Segment seg = handler.segments.get(i);
             if (i > 0) {
                 Outliner.getInstance().showLine("segmentConnection" + i, seg.pos.getCenter(), lastSeg.pos.getCenter());
             }
             Outliner.getInstance().showAABB("segment:" + seg.pos, new AABB(seg.pos))
-                    .colored(i == 0 || i == editorHandler.segments.size() - 1 ? 0xDAA520 : 0x6B8E23)
+                    .colored(i == 0 || i == handler.segments.size() - 1 ? 0xDAA520 : 0x6B8E23)
                     .lineWidth(1 / 16f);
             lastSeg = seg;
         }

@@ -1,7 +1,9 @@
 package org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm;
 
+import com.simibubi.create.content.trains.track.TrackShape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.Util;
 
 import java.util.*;
 
@@ -113,6 +115,10 @@ public class TrackAstarPlanner {
         return segments;
     }
 
+    public static void main(String[] args) {//just for test
+
+    }
+
     public static class NoSolutionException extends Exception {
         public NoSolutionException(String message) {
             super(message);
@@ -159,8 +165,17 @@ public class TrackAstarPlanner {
         public String getStateKey() {
             return x + "," + y + "," + z + "," + dx + "," + dz;
         }
+
         public Segment toSegment() {
-            return new Segment(new BlockPos(x,y,z),new Vec3(dx,0,dz));
+            TrackShape result = TrackShape.NONE;
+            Vec3 target = new Vec3(dx, 0, dz);
+            for (TrackShape shape : Util.getFlatShapes()) {
+                Vec3 axis = shape.getAxes().get(0);
+                if (axis.equals(target)) {
+                    result = shape;
+                }
+            }
+            return new Segment(new BlockPos(x, y, z), result);
         }
     }
 
@@ -173,8 +188,5 @@ public class TrackAstarPlanner {
             this.p2 = p2;
             this.q2 = q2;
         }
-    }
-    public static void main(String[] args) {//just for test
-
     }
 }

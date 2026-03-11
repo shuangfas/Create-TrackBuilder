@@ -49,8 +49,10 @@ public class TrackPreview {
         hoveringStart = start;
         hoveringEnd = end;
         cached = info;
-        Vec3 axis1 = start.axis;
-        Vec3 axis2 = end.axis;
+        Vec3 startAxis = start.getAxis();
+        Vec3 endAxis = end.getAxis();
+        Vec3 axis1 = startAxis;
+        Vec3 axis2 = endAxis;
         Vec3 normal1 = getUpNormal().normalize();
         Vec3 normal2 = getUpNormal().normalize();
         Vec3 normedAxis1 = axis1.normalize();
@@ -64,7 +66,7 @@ public class TrackPreview {
         info.normal1 = normal1;
         info.normal2 = normal2;
         info.axis1 = axis1;
-        info.axis2 = end.axis;
+        info.axis2 = endAxis;
 
         if (axis1.dot(end2.subtract(end1)) < 0) {
             axis1 = axis1.scale(-1);
@@ -81,12 +83,12 @@ public class TrackPreview {
         boolean skipCurve = false;
 
         if ((parallel && normedAxis1.dot(normedAxis2) > 0) || (!parallel && (intersect[0] < 0 || intersect[1] < 0))) {
-            end.axis = end.axis.scale(-1);
+            endAxis = endAxis.scale(-1);
             normedAxis2 = normedAxis2.scale(-1);
-            end2 = getCurveStart(end.pos, end.axis);
+            end2 = getCurveStart(end.pos, endAxis);
             if (level.isClientSide) {
                 info.end2 = end2;
-                info.axis2 = end.axis;
+                info.axis2 = endAxis;
             }
         }
 
@@ -101,7 +103,7 @@ public class TrackPreview {
 
         if (level.isClientSide) {
             Vec3 offset1 = axis1.scale(info.end1Extent);
-            Vec3 offset2 = end.axis.scale(info.end2Extent);
+            Vec3 offset2 = endAxis.scale(info.end2Extent);
             BlockPos targetPos1 = pos1.offset(BlockPos.containing(offset1));
             BlockPos targetEnd = end.pos.offset(BlockPos.containing(offset2));
             info.curve = new BezierConnection(Couple.create(targetPos1, targetEnd),
@@ -156,9 +158,9 @@ public class TrackPreview {
                 return info.withMessage("slope_turn");
             if (Mth.equal(normal1.dot(normal2), 0))
                 return info.withMessage("opposing_slopes");
-            if ((axis1.y < 0 || end.axis.y > 0) && ascend > 0)
+            if ((axis1.y < 0 || endAxis.y > 0) && ascend > 0)
                 return info.withMessage("leave_slope_ascending");
-            if ((axis1.y > 0 || end.axis.y < 0) && ascend < 0)
+            if ((axis1.y > 0 || endAxis.y < 0) && ascend < 0)
                 return info.withMessage("leave_slope_descending");
 
             skipCurve = false;
@@ -168,7 +170,7 @@ public class TrackPreview {
             Direction.Axis plane = Mth.equal(axis1.x, 0) ? Direction.Axis.X : Direction.Axis.Z;
             intersect = VecHelper.intersect(end1, end2, normedAxis1, normedAxis2, plane);
             double dist1 = Math.abs(intersect[0] / axis1.length());
-            double dist2 = Math.abs(intersect[1] / end.axis.length());
+            double dist2 = Math.abs(intersect[1] / endAxis.length());
 
             if (dist1 > dist2)
                 info.end1Extent = (int) Math.round(dist1 - dist2);
@@ -230,7 +232,7 @@ public class TrackPreview {
             if (dist1 > dist2)
                 ex1 = (float) ((dist1 - dist2) / axis1.length());
             if (dist2 > dist1)
-                ex2 = (float) ((dist2 - dist1) / end.axis.length());
+                ex2 = (float) ((dist2 - dist1) / endAxis.length());
 
             double turnSize = Math.min(dist1, dist2) - .1d;
             boolean ninety = (absAngle + .25f) % 90 < 1;
@@ -259,7 +261,7 @@ public class TrackPreview {
         }
 
         Vec3 offset1 = axis1.scale(info.end1Extent);
-        Vec3 offset2 = end.axis.scale(info.end2Extent);
+        Vec3 offset2 = endAxis.scale(info.end2Extent);
         BlockPos targetPos1 = pos1.offset(BlockPos.containing(offset1));
         BlockPos targetEnd = end.pos.offset(BlockPos.containing(offset2));
 
@@ -273,7 +275,7 @@ public class TrackPreview {
         info.start = pos1;
         info.end = end.pos;
         info.axis1 = axis1;
-        info.axis2 = end.axis;
+        info.axis2 = endAxis;
         info.hasRequiredTracks = true;
         return info;
     }

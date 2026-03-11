@@ -7,6 +7,7 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
+import org.shuangfa114.test.createtrackbuilder.content.item.editor.packet.SegmentIncrementalPacket;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.packet.SegmentInitPacket;
 
 import java.util.function.BiConsumer;
@@ -14,7 +15,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public enum ModPackets {
-    SEGMENT_SYNC(SegmentInitPacket.class, SegmentInitPacket::new, NetworkDirection.PLAY_TO_SERVER);
+    SEGMENT_INIT(SegmentInitPacket.class, SegmentInitPacket::new, NetworkDirection.PLAY_TO_SERVER),
+    SEGMENT_INCREMENTAL(SegmentIncrementalPacket.class, SegmentIncrementalPacket::new, NetworkDirection.PLAY_TO_SERVER),
+    ;
     public static final ResourceLocation CHANNEL_NAME = ResourceLocation.fromNamespaceAndPath(CreateTrackBuilder.MODID, "channel");
     public static final int NETWORK_VERSION = 3;
     public static final String NETWORK_VERSION_STR = String.valueOf(NETWORK_VERSION);

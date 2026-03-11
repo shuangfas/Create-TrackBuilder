@@ -166,9 +166,7 @@ public class EditorHandler {
         return activeHotbarSlot;
     }
     public void load(ItemStack stack) {
-        if (segments.isEmpty()) {
-            segments = Segment.tagToList(stack.getOrCreateTag());
-        }
+        segments = Segment.tagToList(stack.getOrCreateTag());
         initialized = stack.getOrCreateTag().getBoolean("Initialized");
     }
 }

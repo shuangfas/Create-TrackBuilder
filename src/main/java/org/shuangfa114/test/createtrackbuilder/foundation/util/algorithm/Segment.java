@@ -1,6 +1,6 @@
 package org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm;
 
-import net.createmod.catnip.math.VecHelper;
+import com.simibubi.create.content.trains.track.TrackShape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -13,35 +13,28 @@ import java.util.List;
 
 public class Segment {
     public BlockPos pos;
-    public Vec3 axis;
+    public TrackShape shape;
 
     public Segment(BlockPos pos) {
         this.pos = pos;
-        this.axis = new Vec3(0,0,0);
-    }
-    public Segment(BlockPos pos, Vec3 axis) {
-        this.pos = pos;
-        this.axis = axis;
+        this.shape = TrackShape.NONE;
     }
 
-    public static CompoundTag listToTag(List<Segment> segments,CompoundTag original) {
+    public Segment(BlockPos pos, TrackShape shape) {
+        this.pos = pos;
+        this.shape = shape;
+    }
+
+    public static CompoundTag listToTag(List<Segment> segments, CompoundTag original) {
         ListTag listTag = new ListTag();
         for (Segment segment : segments) {
             CompoundTag sub = new CompoundTag();
-            sub.put("position", NbtUtils.writeBlockPos(segment.pos));
-            sub.put("axis", VecHelper.writeNBT(segment.axis));
+            sub.put("Position", NbtUtils.writeBlockPos(segment.pos));
+            sub.putString("Shape", segment.shape.name());
             listTag.add(sub);
         }
         original.put("Segments", listTag);
         return original;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Segment segment) {
-            return pos.equals(segment.pos) && axis.equals(segment.axis);
-        }
-        return false;
     }
 
     public static List<Segment> tagToList(CompoundTag tag) {
@@ -49,11 +42,30 @@ public class Segment {
         if (tag != null && !tag.isEmpty()) {
             for (Tag seg : tag.getList("Segments", Tag.TAG_COMPOUND)) {
                 if (seg instanceof CompoundTag compoundTag) {
-                    segments.add(new Segment(NbtUtils.readBlockPos(compoundTag.getCompound("position"))
-                            , VecHelper.readNBT(compoundTag.getList("axis",Tag.TAG_DOUBLE))));
+                    segments.add(new Segment(NbtUtils.readBlockPos(compoundTag.getCompound("Position"))
+                            , TrackShape.valueOf(compoundTag.getString("Shape"))));
                 }
             }
         }
         return segments;
+    }
+
+    public CompoundTag toTag() {
+        CompoundTag tag = new CompoundTag();
+        tag.put("Position", NbtUtils.writeBlockPos(this.pos));
+        tag.putString("Shape", this.shape.name());
+        return tag;
+    }
+
+    public Vec3 getAxis() {
+        return this.shape.getAxes().get(0);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Segment segment) {
+            return pos.equals(segment.pos) && shape.equals(segment.shape);
+        }
+        return false;
     }
 }
