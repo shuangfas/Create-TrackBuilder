@@ -16,6 +16,7 @@ public class ModTab {
             .title(Component.translatable("modname.create_track_builder"))
             .displayItems((pParameters, pOutput) -> {
                 pOutput.accept(Register.BUILDER_BLOCK.get());
+                pOutput.accept(Register.TRACK_EDITOR);
             })
             .build());
 }

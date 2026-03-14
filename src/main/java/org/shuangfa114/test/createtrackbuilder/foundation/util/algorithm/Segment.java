@@ -8,7 +8,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Segment {
@@ -38,7 +38,7 @@ public class Segment {
     }
 
     public static List<Segment> tagToList(CompoundTag tag) {
-        List<Segment> segments = new ArrayList<>();
+        List<Segment> segments = new LinkedList<>();
         if (tag != null && !tag.isEmpty()) {
             for (Tag seg : tag.getList("Segments", Tag.TAG_COMPOUND)) {
                 if (seg instanceof CompoundTag compoundTag) {

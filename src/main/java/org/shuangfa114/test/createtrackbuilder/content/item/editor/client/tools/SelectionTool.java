@@ -5,13 +5,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.packet.SegmentIncrementalPacket;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.packet.SegmentInitPacket;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.ModLang;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.Util;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
 
 public class SelectionTool extends EditorToolBase {
-    public static boolean enableAxis = false;
 
     @Override
     public void init() {
@@ -33,9 +34,9 @@ public class SelectionTool extends EditorToolBase {
                 ModLang.translate("selection.connection_init").sendStatus(Minecraft.getInstance().player);
                 return true;
             }
-            Segment seg = new Segment(selectedPos);
+            Segment seg = new Segment(selectedPos, Util.getBestShape(Minecraft.getInstance().player));
             if (!handler.segments.contains(seg)) {
-                Minecraft.getInstance().player.displayClientMessage(ModLang.translateDirect("selection.points", handler.segments.size()), true);
+                Minecraft.getInstance().player.displayClientMessage(ModLang.translate("selection.points", handler.segments.size()).component(), true);
                 handler.segments.add(seg);
                 handler.sync(new SegmentIncrementalPacket(seg, handler.getActiveHotbarSlot()));
                 return true;

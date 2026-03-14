@@ -16,7 +16,7 @@ import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.client.tools.EditorToolType;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 //I'm king of copying and pasting!!!!
@@ -33,7 +33,7 @@ public class EditorHandler {
     public EditorHandler() {
         currentTool = EditorToolType.SELECTION_INIT;
         selectionScreen = new ToolSelectionScreen(ImmutableList.of(EditorToolType.SELECTION_INIT), this::equip);
-        segments = new ArrayList<>();
+        segments = new LinkedList<>();
     }
 
     public void tick() {

@@ -16,7 +16,6 @@ public class SegmentInitPacket extends SimplePacketBase {
     }
 
     public SegmentInitPacket(FriendlyByteBuf buf) {
-        CompoundTag tag = buf.readNbt();
         slot = buf.readInt();
     }
 

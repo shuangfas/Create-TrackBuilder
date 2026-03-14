@@ -26,7 +26,7 @@ public enum EditorToolType {
     }
 
     public MutableComponent getDisplayName() {
-        return ModLang.translateDirect("schematic.tool." + Lang.asId(name()));
+        return ModLang.translate("schematic.tool." + Lang.asId(name())).component();
     }
 
     public AllIcons getIcon() {
