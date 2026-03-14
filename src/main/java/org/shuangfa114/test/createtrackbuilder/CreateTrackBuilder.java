@@ -19,8 +19,6 @@ public class CreateTrackBuilder {
 
     // Define mod id in a common place for everything to reference
     public static final String MODID = "create_track_builder";
-    // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(CreateTrackBuilder.MODID);
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(CreateTrackBuilder.MODID, "textures/gui/background.png"),
@@ -28,6 +26,8 @@ public class CreateTrackBuilder {
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
     );
+    // Directly reference a slf4j logger
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public CreateTrackBuilder(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
@@ -37,7 +37,9 @@ public class CreateTrackBuilder {
         REGISTRATE.setCreativeTab(ModTab.TAB);
         Register.register();
         ModPackets.registerPackets();
+        ModMenuTypes.register();
     }
+
     public static CreateRegistrate registrate() {
         return REGISTRATE;
     }

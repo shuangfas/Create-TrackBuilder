@@ -37,4 +37,12 @@ public class BuilderTransform extends ValueBoxTransform {
         Direction.Axis axis = state.getValue(BuilderBlock.HORIZONTAL_AXIS);
         return axis == Direction.Axis.X ? Direction.WEST : Direction.SOUTH;
     }
+
+    @Override
+    public boolean testHit(LevelAccessor level, BlockPos pos, BlockState state, Vec3 localHit) {
+        Vec3 offset = getLocalOffset(level, pos, state);
+        if (offset == null)
+            return false;
+        return localHit.distanceTo(offset) < scale / 3;
+    }
 }

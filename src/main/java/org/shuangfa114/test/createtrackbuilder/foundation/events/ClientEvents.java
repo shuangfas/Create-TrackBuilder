@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilder;
 import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
-import org.shuangfa114.test.createtrackbuilder.foundation.blockEntity.behaviour.ItemPlacingRender;
+import org.shuangfa114.test.createtrackbuilder.foundation.blockEntity.behaviour.MultiFilterRender;
 
 @Mod.EventBusSubscriber(modid = CreateTrackBuilder.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientEvents {
@@ -42,9 +42,7 @@ public class ClientEvents {
         if(event.phase == TickEvent.Phase.START) {
             return;
         }
-        //ItemPreview.onClientTick(event);
-        ItemPlacingRender.tick();
-        //TrackPreview.clientTick();
+        MultiFilterRender.tick();
         CreateTrackBuilderClient.editorHandler.tick();
     }
 
@@ -61,8 +59,7 @@ public class ClientEvents {
         PoseStack ms = event.getPoseStack();
         ms.pushPose();
         SuperRenderTypeBuffer buffer = DefaultSuperRenderTypeBuffer.getInstance();
-        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera()
-                .getPosition();
+        Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         CreateTrackBuilderClient.editorHandler.render(ms, buffer, camera);
         buffer.draw();
         RenderSystem.enableCull();
