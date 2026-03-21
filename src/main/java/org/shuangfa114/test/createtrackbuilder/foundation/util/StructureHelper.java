@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -42,19 +41,13 @@ public class StructureHelper {
 
     public static StructureTemplate toTemplate(SchematicLevel schematicLevel, BlockPos anchor) {
         StructureTemplate template = new StructureTemplate();
-        List<BlockPos> posList = new ArrayList<>();
-        List<BlockState> stateList = new ArrayList<>();
-        List<CompoundTag> nbtList = new ArrayList<>();
-        int[] min = new int[3];
+        List<StructureTemplate.StructureBlockInfo> info = new LinkedList<>();
         int[] max = new int[3];
         for (BlockPos origin : schematicLevel.getAllPositions()) {
             BlockPos blockPos = origin.subtract(anchor);
             int x = blockPos.getX();
             int y = blockPos.getY();
             int z = blockPos.getZ();
-            min[0] = Math.min(min[0], x);
-            min[1] = Math.min(min[1], y);
-            min[2] = Math.min(min[2], z);
             max[0] = Math.max(max[0], Math.abs(x));
             max[1] = Math.max(max[1], Math.abs(y));
             max[2] = Math.max(max[2], Math.abs(z));
@@ -63,14 +56,8 @@ public class StructureHelper {
             BlockState blockstate = schematicLevel.getBlockState(origin);
             if (!blockstate.isAir()) {
                 CompoundTag tag = blockEntity == null ? null : blockEntity.saveWithId();
-                posList.add(blockPos);
-                stateList.add(blockstate);
-                nbtList.add(tag);
+                info.add(new StructureTemplate.StructureBlockInfo(blockPos, blockstate, tag));
             }
-        }
-        List<StructureTemplate.StructureBlockInfo> info = new LinkedList<>();
-        for (int i = 0; i < posList.size(); i++) {
-            info.add(new StructureTemplate.StructureBlockInfo(posList.get(i).offset(-min[0], -min[1], -min[2]), stateList.get(i), nbtList.get(i)));
         }
         ((StructureTemplateAccessor) template).getPalettes().add(PaletteInvoker.create(info));
         ((StructureTemplateAccessor) template).setSize(new Vec3i(max[0] + 1, max[1] + 1, max[2] + 1));

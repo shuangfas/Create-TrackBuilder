@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.content.item.editor.packet;
+package org.shuangfa114.test.createtrackbuilder.foundation.packet;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;

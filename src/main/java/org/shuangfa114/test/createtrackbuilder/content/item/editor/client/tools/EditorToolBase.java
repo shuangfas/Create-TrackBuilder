@@ -1,7 +1,6 @@
 package org.shuangfa114.test.createtrackbuilder.content.item.editor.client.tools;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.content.trains.track.TrackShape;
@@ -15,9 +14,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
@@ -26,9 +24,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.client.EditorHandler;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
-
-import java.util.Iterator;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.TrackPreview;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
 
 public abstract class EditorToolBase implements IEditorTool {
     private static final ItemStack indicator = new ItemStack(AllItems.BRASS_HAND);
@@ -96,26 +93,25 @@ public abstract class EditorToolBase implements IEditorTool {
 
     @Override
     public void renderTool(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera) {//fuck math fuck render fuck everything i can see
-        rotationAmount = (AnimationTickHolder.getPartialTicks()/10 + rotationAmount) % 10;
+        rotationAmount = (AnimationTickHolder.getPartialTicks() / 10 + rotationAmount) % 10;
         Minecraft mc = Minecraft.getInstance();
-        Vec3 axis = Vec3.ZERO;
+        Vec3 axis;
         for (Segment segment : handler.segments) {
             if (segment.shape == TrackShape.NONE) {
                 continue;
             }
-            Vec3 centre2 = segment.pos.getCenter().subtract(0,0.4,0).subtract(camera);
+            Vec3 centre2 = segment.pos.getCenter().subtract(0, 0.4, 0).subtract(camera);
             axis = segment.getAxis();
             ms.pushPose();
             ms.translate(centre2.x, centre2.y, centre2.z);
-            for(boolean t: Iterate.falseAndTrue){
+            for (boolean t : Iterate.falseAndTrue) {
                 ms.pushPose();
-                correctDirection(ms,axis,t);
-                renderIndicator(ms,buffer,mc);
+                correctDirection(ms, axis, t);
+                renderIndicator(ms, buffer, mc);
                 ms.popPose();
             }
             ms.popPose();
         }
-        Minecraft.getInstance().player.displayClientMessage(Component.literal(axis + "=" + Math.toDegrees(getRadiansOfAxis(axis))), true);
     }
 
     @Override
@@ -138,6 +134,9 @@ public abstract class EditorToolBase implements IEditorTool {
                     .lineWidth(1 / 16f);
             lastSeg = seg;
         }
+        if (handler.isInitialized()) {
+            TrackPreview.clientTick(handler.segments);
+        }
     }
 
     public boolean shouldShowSelection() {
@@ -151,18 +150,24 @@ public abstract class EditorToolBase implements IEditorTool {
     public float getRadiansOfAxis(Vec3 axis) {
         return (float) Math.atan2(-axis.z, axis.x);
     }
+
     public void renderIndicator(PoseStack ms, SuperRenderTypeBuffer buffer, Minecraft mc) {
         mc.getItemRenderer().render(indicator, ItemDisplayContext.FIXED, false, ms,
-                buffer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
-                mc.getItemRenderer().getModel(indicator, null, null, 0));
+                buffer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, getIndicatorModel(mc));
     }
-    public void correctDirection(PoseStack ms,Vec3 axis,boolean negative){
+
+    public BakedModel getIndicatorModel(Minecraft mc) {
+        BakedModel model = mc.getItemRenderer().getItemModelShaper().getItemModel(AllItems.BRASS_HAND.get());
+        return model == null ? mc.getModelManager().getMissingModel() : model;
+    }
+
+    public void correctDirection(PoseStack ms, Vec3 axis, boolean negative) {
         TransformStack.of(ms)
                 .translate(axis.normalize().scale(negative ? -.4 : .4))
                 .rotateZDegrees(90)
                 .rotateYDegrees(90)
                 .rotateZDegrees(135)
                 .rotateZ(getRadiansOfAxis(axis))
-                .rotateZDegrees(negative?180:0);
+                .rotateZDegrees(negative ? 180 : 0);
     }
 }

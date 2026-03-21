@@ -7,7 +7,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-public class VoidTransform extends ValueBoxTransform {
+public class PlaceHolderTransform extends ValueBoxTransform {
     @Override
     public boolean shouldRender(LevelAccessor level, BlockPos pos, BlockState state) {
         return false;

@@ -14,7 +14,9 @@ import net.minecraft.world.phys.Vec3;
 import org.shuangfa114.test.createtrackbuilder.ModPackets;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.client.tools.EditorToolType;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
+import org.shuangfa114.test.createtrackbuilder.foundation.packet.editor.OwnerSettingPacket;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.TrackPreview;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +46,7 @@ public class EditorHandler {
             active = false;
             activeHotbarSlot = 0;
             activeEditorItem = null;
+            TrackPreview.clearCaches();
             return;
         }
         if (!active) {
@@ -79,10 +82,11 @@ public class EditorHandler {
     public void init(LocalPlayer player, ItemStack stack) {
         active = true;
         load(stack);
+        sync(new OwnerSettingPacket(activeHotbarSlot, player.getGameProfile().getName()));
         if (initialized) {
             EditorToolType toolBefore = currentTool;
             selectionScreen = new ToolSelectionScreen(EditorToolType.getTools(player.isCreative()), this::equip);
-            if (toolBefore != null&&EditorToolType.getTools(player.isCreative()).contains(toolBefore)) {
+            if (toolBefore != null && EditorToolType.getTools(player.isCreative()).contains(toolBefore)) {
                 selectionScreen.setSelectedElement(toolBefore);
                 equip(toolBefore);
             }
@@ -165,8 +169,13 @@ public class EditorHandler {
     public int getActiveHotbarSlot() {
         return activeHotbarSlot;
     }
+
     public void load(ItemStack stack) {
         segments = Segment.tagToList(stack.getOrCreateTag());
         initialized = stack.getOrCreateTag().getBoolean("Initialized");
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 }

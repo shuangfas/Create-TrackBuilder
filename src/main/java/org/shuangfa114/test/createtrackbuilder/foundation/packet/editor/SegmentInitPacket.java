@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.content.item.editor.packet;
+package org.shuangfa114.test.createtrackbuilder.foundation.packet.editor;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.nbt.CompoundTag;
@@ -6,6 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
+import org.shuangfa114.test.createtrackbuilder.foundation.packet.NetworkUtil;
 
 
 public class SegmentInitPacket extends SimplePacketBase {

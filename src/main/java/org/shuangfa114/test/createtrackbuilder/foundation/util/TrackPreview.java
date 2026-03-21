@@ -1,50 +1,57 @@
 package org.shuangfa114.test.createtrackbuilder.foundation.util;
 
 import com.simibubi.create.AllSpecialTextures;
-import com.simibubi.create.content.trains.track.BezierConnection;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import com.simibubi.create.foundation.utility.CreateLang;
+import com.simibubi.create.AllTags;
+import com.simibubi.create.content.trains.track.*;
 import net.createmod.catnip.data.Couple;
+import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.data.Pair;
+import net.createmod.catnip.levelWrappers.SchematicLevel;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.math.VecHelper;
 import net.createmod.catnip.outliner.Outliner;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.Nullable;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm.Segment;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.SegmentEdge;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 //too much information!!!!!!!
 public class TrackPreview {
     public static PlacementInfo cached;
-    public static List<Segment> segments;
+    public static HashMap<SegmentEdge, PlacementInfo> caches = new HashMap<>();
     static Segment hoveringStart;
     static Segment hoveringEnd;
     static boolean hoveringMaxed;
     static BlockPos hintPos;
-    static Couple<List<BlockPos>> hints;
+    static List<BlockPos> hints;
     static int lastLineCount = 0;
-    public static TrackPreview.PlacementInfo preview;
 
     public static PlacementInfo tryConnect(Level level, Segment start, Segment end, boolean maximiseTurn) {
+        return tryConnect(level, start, end, ItemStack.EMPTY, maximiseTurn);
+    }
+
+    public static PlacementInfo tryConnect(Level level, Segment start, Segment end, ItemStack stack, boolean maximiseTurn) {
         boolean girder = false;
         if (level.isClientSide && cached != null && start.equals(hoveringStart) && end.equals(hoveringEnd) && hoveringMaxed == maximiseTurn)
             return cached;
 
-        PlacementInfo info = new PlacementInfo();
+        PlacementInfo info = new PlacementInfo(stack);
         hoveringMaxed = maximiseTurn;
         hoveringStart = start;
         hoveringEnd = end;
@@ -59,8 +66,7 @@ public class TrackPreview {
         Vec3 normedAxis2 = axis2.normalize();
         Vec3 end1 = getCurveStart(start.pos, axis1);
         Vec3 end2 = getCurveStart(end.pos, axis2);
-        //Segment segment = segments.get(seg);
-        BlockPos pos1 = start.pos;//开始坐标
+        BlockPos pos1 = start.pos;
         info.end1 = end1;
         info.end2 = end2;
         info.normal1 = normal1;
@@ -104,9 +110,9 @@ public class TrackPreview {
         if (level.isClientSide) {
             Vec3 offset1 = axis1.scale(info.end1Extent);
             Vec3 offset2 = endAxis.scale(info.end2Extent);
-            BlockPos targetPos1 = pos1.offset(BlockPos.containing(offset1));
+            BlockPos targetStart = pos1.offset(BlockPos.containing(offset1));
             BlockPos targetEnd = end.pos.offset(BlockPos.containing(offset2));
-            info.curve = new BezierConnection(Couple.create(targetPos1, targetEnd),
+            info.curve = new BezierConnection(Couple.create(targetStart, targetEnd),
                     Couple.create(end1.add(offset1), end2.add(offset2)), Couple.create(normedAxis1, normedAxis2),
                     Couple.create(normal1, normal2), true, girder, TrackMaterial.ANDESITE);
         }
@@ -262,159 +268,215 @@ public class TrackPreview {
 
         Vec3 offset1 = axis1.scale(info.end1Extent);
         Vec3 offset2 = endAxis.scale(info.end2Extent);
-        BlockPos targetPos1 = pos1.offset(BlockPos.containing(offset1));
+        BlockPos targetStart = pos1.offset(BlockPos.containing(offset1));
         BlockPos targetEnd = end.pos.offset(BlockPos.containing(offset2));
 
         info.curve = skipCurve ? null
-                : new BezierConnection(Couple.create(targetPos1, targetEnd),
+                : new BezierConnection(Couple.create(targetStart, targetEnd),
                 Couple.create(end1.add(offset1), end2.add(offset2)), Couple.create(normedAxis1, normedAxis2),
                 Couple.create(normal1, normal2), true, girder, TrackMaterial.ANDESITE);
 
         info.valid = true;
 
-        info.start = pos1;
-        info.end = end.pos;
+        info.start = new Segment(pos1, start.shape);
+        info.end = end;
         info.axis1 = axis1;
         info.axis2 = endAxis;
         info.hasRequiredTracks = true;
         return info;
     }
 
-    /*@OnlyIn(Dist.CLIENT)
-    public static void clientTick() {
-        LocalPlayer player = Minecraft.getInstance().player;
-        ItemStack stack = player.getMainHandItem();
-        if (!(stack.getItem() instanceof TrackEditor trackEditor)) {
-            return;
+    public static void paveTracksInSchematic(@Nullable SchematicLevel schematicLevel, PlacementInfo info, BlockItem blockItem, boolean simulate) {
+        Block block = blockItem.getBlock();
+        info.requiredPavement = 0;
+        Set<BlockPos> visited = new HashSet<>();
+        for (boolean first : Iterate.trueAndFalse) {
+            int extent = (first ? info.end1Extent : info.end2Extent) + (info.curve != null ? 1 : 0);
+            Vec3 axis = first ? info.axis1 : info.axis2;
+            BlockPos pavePos = first ? info.start.pos : info.end.pos;
+            info.requiredPavement += TrackPaver.paveStraight(schematicLevel, pavePos.below(), axis, extent, block, simulate, visited);
         }
-        if (!trackEditor.isPosValid(stack)) {
-            return;
-        }
-        Level level = player.level();
-        BlockPos pos = trackEditor.getEndPos(stack);
-        PlacementInfo info = preview;
-        if (cached == null) {
-            return;
-        }
-        if (info.valid)
-            player.displayClientMessage(CreateLang.translateDirect("track.valid_connection")
-                    .withStyle(ChatFormatting.GREEN), true);
-        else if (info.message != null)
-            player.displayClientMessage(CreateLang.translateDirect(info.message)
-                            .withStyle(info.message.equals("track.second_point") ? ChatFormatting.WHITE : ChatFormatting.RED),
-                    true);
-        if (!info.valid) {
-            if (!pos.equals(hintPos)) {
-                hints = Couple.create(ArrayList::new);
-                hintPos = pos;
+        if (info.curve != null)
+            info.requiredPavement += TrackPaver.paveCurve(schematicLevel, info.curve, block, simulate, visited);
+    }
 
-                for (int xOffset = -5; xOffset <= 5; xOffset++) {
-                    for (int zOffset = -5; zOffset <= 5; zOffset++) {
-                        BlockPos offset = pos.offset(xOffset, 0, zOffset);
-                        if (!level.getBlockState(offset).isAir()) {
-                            continue;
-                        }
-                        Segment start = new Segment(trackEditor.getStartPos(stack), Util.getAxis(trackEditor.getStartShape(stack)));
-                        Segment end = new Segment(offset, Util.getAxis(trackEditor.getStartShape(stack)));
-                        PlacementInfo adjInfo = tryConnect(level, start, end, false);
-                        hints.get(adjInfo.valid)
-                                .add(offset.below());
-                    }
+    public static void placeTracksInSchematic(@Nullable SchematicLevel schematicLevel, PlacementInfo info) {
+        Vec3 offset1 = info.axis1.scale(info.end1Extent);
+        Vec3 offset2 = info.axis2.scale(info.end2Extent);
+        BlockPos targetPos1 = info.start.pos.offset(BlockPos.containing(offset1));
+        BlockPos targetPos2 = info.end.pos.offset(BlockPos.containing(offset2));
+        boolean inSchematic = schematicLevel != null;
+        info.requiredTracks = 0;
+        BlockState track = info.trackMaterial.getBlock().defaultBlockState();
+        for (boolean first : Iterate.trueAndFalse) {
+            int extent = first ? info.end1Extent : info.end2Extent;
+            Vec3 axis = first ? info.axis1 : info.axis2;
+            BlockPos pos = first ? info.start.pos : info.end.pos;
+            BlockState toPlace = track.setValue(TrackBlock.SHAPE, first ? info.start.shape : info.end.shape);
+            for (int i = 0; i < (info.curve != null ? extent + 1 : extent); i++) {
+                Vec3 offset = axis.scale(i);
+                BlockPos offsetPos = pos.offset(BlockPos.containing(offset));
+                info.requiredTracks++;
+                if (!inSchematic||!schematicLevel.getBlockState(offsetPos).canBeReplaced()) {
+                    continue;
+                }
+                schematicLevel.setBlock(offsetPos, toPlace, 3);
+            }
+        }
+        if (info.curve != null) {
+            info.requiredTracks += (info.curve.getSegmentCount() + 1) / 2;
+            if (inSchematic) {
+                BlockState stateAtPos = schematicLevel.getBlockState(targetPos1).setValue(TrackBlock.HAS_BE, true);
+                BlockState onto = info.trackMaterial.getBlock().defaultBlockState().setValue(TrackBlock.HAS_BE, true);
+                onto.setValue(TrackBlock.SHAPE, info.start.shape);
+                schematicLevel.setBlock(targetPos1, AllTags.AllBlockTags.TRACKS.matches(stateAtPos) ? stateAtPos : onto, 3);
+                schematicLevel.setBlock(targetPos2, onto.setValue(TrackBlock.SHAPE, info.end.shape), 3);
+                BlockEntity te1 = schematicLevel.getBlockEntity(targetPos1);
+                BlockEntity te2 = schematicLevel.getBlockEntity(targetPos2);
+                if (te1 instanceof TrackBlockEntity tte1 && te2 instanceof TrackBlockEntity tte2) {
+                    tte1.addConnection(info.curve);
+                    tte2.addConnection(info.curve.secondary());
                 }
             }
-
-            if (hints != null && !hints.either(Collection::isEmpty)) {
-                Outliner.getInstance().showCluster("track_valid", hints.getFirst())
-                        .withFaceTexture(AllSpecialTextures.THIN_CHECKERED)
-                        .colored(0x95CD41)
-                        .lineWidth(0);
-                Outliner.getInstance().showCluster("track_invalid", hints.getSecond())
-                        .withFaceTexture(AllSpecialTextures.THIN_CHECKERED)
-                        .colored(0xEA5C2B)
-                        .lineWidth(0);
-            }
         }
+    }
 
-        if (!info.valid) {
-            info.end1Extent = 0;
-            info.end2Extent = 0;
-        }
-        int color = info.valid ? 0x95CD41 : 0xEA5C2B;
-        Vec3 up = new Vec3(0, 4 / 16f, 0);
+    public static void calculateTracksRequired(PlacementInfo info) {
+        placeTracksInSchematic(null, info);
+    }
 
-        {
-            Vec3 v1 = info.end1;
-            Vec3 a1 = info.axis1.normalize();
-            Vec3 n1 = info.normal1.cross(a1)
-                    .scale(15 / 16f);
-            Vec3 o1 = a1.scale(0.125f);
-            Vec3 ex1 =
-                    a1.scale((info.end1Extent - (info.curve == null && info.end1Extent > 0 ? 2 : 0)) * info.axis1.length());
-            line(1, v1.add(n1).add(up), o1, ex1, color);
-            line(2, v1.subtract(n1).add(up), o1, ex1, color);
-            Vec3 v2 = info.end2;
-            Vec3 a2 = info.axis2.normalize();
-            Vec3 n2 = info.normal2.cross(a2)
-                    .scale(15 / 16f);
-            Vec3 o2 = a2.scale(0.125f);
-            Vec3 ex2 = a2.scale(info.end2Extent * info.axis2.length());
-            line(3, v2.add(n2).add(up), o2, ex2, color);
-            line(4, v2.subtract(n2).add(up), o2, ex2, color);
-        }
+    public static void calculatePavementRequired(Level level, PlacementInfo info, BlockItem blockItem) {
+        paveTracksInSchematic(new SchematicLevel(level), info, blockItem, true);
+    }
 
-        BezierConnection bc = info.curve;
-        if (bc == null)
+    @OnlyIn(Dist.CLIENT)
+    public static void clientTick(List<Segment> segments) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        ItemStack stack = player.getMainHandItem();
+        if (!(stack.getItem() instanceof TrackEditor)) {
             return;
+        }
+        if (segments.size() < 2) {
+            return;
+        }
+        hints = new ArrayList<>();
+        for (int j = 0; j < segments.size() - 1; j++) {
+            Segment start = segments.get(j);
+            Segment end = segments.get(j + 1);
+            SegmentEdge edge = SegmentEdge.of(start, end);
+            Level level = player.level();
+            PlacementInfo info = caches.computeIfAbsent(edge, (key) -> tryConnect(level, start, end, true));
+            if (!info.valid) {
+//                if (!pos.equals(hintPos)) {
+//                    hintPos = pos;
+//                    for (int xOffset = -3; xOffset <= 3; xOffset++) {
+//                        for (int zOffset = -3; zOffset <= 3; zOffset++) {
+//                            BlockPos offset = pos.offset(xOffset, 0, zOffset);
+//                            if (!level.getBlockState(offset).isAir()) {
+//                                continue;
+//                            }
+//                            PlacementInfo adjInfo = tryConnect(level, start, end, false);
+//                            if (!adjInfo.valid) {
+//                                hints.add(offset.below());
+//                            }
+//                        }
+//                    }
+//                }
+                info.end1Extent = 0;
+                info.end2Extent = 0;
+            }
+            int color = info.valid ? 0x95CD41 : 0xEA5C2B;
+            Vec3 up = new Vec3(0, 4 / 16f, 0);
 
-        Vec3 previous1 = null;
-        Vec3 previous2 = null;
-        int segCount = bc.getSegmentCount();
-
-        Vec3 end1 = bc.starts.getFirst();
-        Vec3 end2 = bc.starts.getSecond();
-        Vec3 finish1 = end1.add(bc.axes.getFirst()
-                .scale(bc.getHandleLength()));
-        Vec3 finish2 = end2.add(bc.axes.getSecond()
-                .scale(bc.getHandleLength()));
-        String key = "curve";
-
-        for (int i = 0; i <= segCount; i++) {
-            float t = i / (float) segCount;
-            Vec3 result = VecHelper.bezier(end1, end2, finish1, finish2, t);
-            Vec3 derivative = VecHelper.bezierDerivative(end1, end2, finish1, finish2, t)
-                    .normalize();
-            Vec3 normal = bc.getNormal(t)
-                    .cross(derivative)
-                    .scale(15 / 16f);
-            Vec3 rail1 = result.add(normal)
-                    .add(up);
-            Vec3 rail2 = result.subtract(normal)
-                    .add(up);
-
-            if (previous1 != null) {
-                Outliner.getInstance()
-                        .showLine(Pair.of(key, i * 2), previous1, rail1)
-                        .colored(color)
-                        .disableLineNormals()
-                        .lineWidth(1 / 16f);
-                Outliner.getInstance()
-                        .showLine(Pair.of(key, i * 2 + 1), previous2, rail2)
-                        .colored(color)
-                        .disableLineNormals()
-                        .lineWidth(1 / 16f);
+            {
+                Vec3 v1 = info.end1;
+                Vec3 a1 = info.axis1.normalize();
+                Vec3 n1 = info.normal1.cross(a1)
+                        .scale(15 / 16f);
+                Vec3 o1 = a1.scale(0.125f);
+                Vec3 ex1 =
+                        a1.scale((info.end1Extent - (info.curve == null && info.end1Extent > 0 ? 2 : 0)) * info.axis1.length());
+                int hashCode = edge.hashCode();
+                line(1 + hashCode, v1.add(n1).add(up), o1, ex1, color);
+                line(2 + hashCode, v1.subtract(n1).add(up), o1, ex1, color);
+                Vec3 v2 = info.end2;
+                Vec3 a2 = info.axis2.normalize();
+                Vec3 n2 = info.normal2.cross(a2)
+                        .scale(15 / 16f);
+                Vec3 o2 = a2.scale(0.125f);
+                Vec3 ex2 = a2.scale(info.end2Extent * info.axis2.length());
+                line(3 + hashCode, v2.add(n2).add(up), o2, ex2, color);
+                line(4 + hashCode, v2.subtract(n2).add(up), o2, ex2, color);
             }
 
-            previous1 = rail1;
-            previous2 = rail2;
-        }
+            BezierConnection bc = info.curve;
+            if (bc == null)
+                continue;
 
-        for (int i = segCount + 1; i <= lastLineCount; i++) {
-            Outliner.getInstance().remove(Pair.of(key, i * 2));
-            Outliner.getInstance().remove(Pair.of(key, i * 2 + 1));
-        }
+            Vec3 previous1 = null;
+            Vec3 previous2 = null;
+            int segCount = bc.getSegmentCount();
 
-        lastLineCount = segCount;
-    }*/
+            Vec3 end1 = bc.starts.getFirst();
+            Vec3 end2 = bc.starts.getSecond();
+            Vec3 finish1 = end1.add(bc.axes.getFirst()
+                    .scale(bc.getHandleLength()));
+            Vec3 finish2 = end2.add(bc.axes.getSecond()
+                    .scale(bc.getHandleLength()));
+            String key = "curve" + end1.hashCode() + end2.hashCode();
+
+            for (int i = 0; i <= segCount; i += 2) {//origin is i++
+                float t = i / (float) segCount;
+                Vec3 result = VecHelper.bezier(end1, end2, finish1, finish2, t);
+                Vec3 derivative = VecHelper.bezierDerivative(end1, end2, finish1, finish2, t)
+                        .normalize();
+                Vec3 normal = bc.getNormal(t)
+                        .cross(derivative)
+                        .scale(15 / 16f);
+                Vec3 rail1 = result.add(normal)
+                        .add(up);
+                Vec3 rail2 = result.subtract(normal)
+                        .add(up);
+
+                if (previous1 != null) {
+                    Outliner.getInstance()
+                            .showLine(Pair.of(key, i * 2), previous1, rail1)
+                            .colored(color)
+                            .disableLineNormals()
+                            .lineWidth(1 / 16f);
+                    Outliner.getInstance()
+                            .showLine(Pair.of(key, i * 2 + 1), previous2, rail2)
+                            .colored(color)
+                            .disableLineNormals()
+                            .lineWidth(1 / 16f);
+                }
+
+                previous1 = rail1;
+                previous2 = rail2;
+            }
+
+//            for (int i = segCount + 1; i <= lastLineCount; i++) {
+//                Outliner.getInstance().remove(Pair.of(key, i * 2));
+//                Outliner.getInstance().remove(Pair.of(key, i * 2 + 1));
+//            }
+//
+//            lastLineCount = segCount;
+        }
+        if (hints != null && !hints.isEmpty()) {
+            Outliner.getInstance().showCluster("track_invalid", hints)
+                    .withFaceTexture(AllSpecialTextures.THIN_CHECKERED)
+                    .colored(0xEA5C2B)
+                    .lineWidth(0);
+        }
+    }
+
+    public static void change(SegmentEdge origin, SegmentEdge target) {
+        caches.replace(origin, tryConnect(Minecraft.getInstance().level, target.first, target.second, true));
+    }
+
+    public static void clearCaches() {
+        caches.clear();
+    }
 
     @OnlyIn(Dist.CLIENT)
     private static void line(int id, Vec3 v1, Vec3 o1, Vec3 ex, int color) {
@@ -440,20 +502,24 @@ public class TrackPreview {
         public boolean hasRequiredTracks = false;
         public int requiredPavement = 0;
         public boolean hasRequiredPavement = false;
-        // for visualization
+        public TrackMaterial trackMaterial;
         public Vec3 end1;
         public Vec3 end2;
         public Vec3 normal1;
         public Vec3 normal2;
         public Vec3 axis1;
         public Vec3 axis2;
-        public BlockPos start;
-        public BlockPos end;
+        public Segment start;
+        public Segment end;
+        public boolean valid = false;
         BezierConnection curve = null;
-        boolean valid = false;
         int end1Extent = 0;
         int end2Extent = 0;
         String message = null;
+
+        public PlacementInfo(ItemStack itemStack) {
+            this.trackMaterial = TrackMaterial.fromItem(itemStack.getItem());
+        }
 
         public PlacementInfo withMessage(String message) {
             this.message = "track." + message;

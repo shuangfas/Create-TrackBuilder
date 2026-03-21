@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.foundation.util.algorithm;
+package org.shuangfa114.test.createtrackbuilder.foundation.util.structures;
 
 import com.simibubi.create.content.trains.track.TrackShape;
 import net.minecraft.core.BlockPos;
@@ -57,6 +57,10 @@ public class Segment {
         return tag;
     }
 
+    public static Segment fromTag(CompoundTag tag) {
+        return new Segment(NbtUtils.readBlockPos(tag.getCompound("Position")), TrackShape.valueOf(tag.getString("Shape")));
+    }
+
     public Vec3 getAxis() {
         return this.shape.getAxes().get(0);
     }
@@ -67,5 +71,10 @@ public class Segment {
             return pos.equals(segment.pos) && shape.equals(segment.shape);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return pos.hashCode() ^ shape.hashCode();
     }
 }

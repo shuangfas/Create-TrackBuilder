@@ -7,6 +7,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxRenderer;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
+import dev.engine_room.flywheel.lib.transform.TransformStack;
 import net.createmod.catnip.data.Pair;
 import net.createmod.catnip.math.VecHelper;
 import net.createmod.catnip.outliner.Outliner;
@@ -109,6 +110,7 @@ public class MultiFilterRender {
             if (slotPositioning.shouldRender(level, blockPos, blockState)) {
                 ms.pushPose();
                 slotPositioning.transform(level, blockPos, blockState, ms);
+                TransformStack.of(ms).rotateZDegrees(90);
                 ValueBoxRenderer.renderItemIntoValueBox(behaviour.getFilter(), ms, buffer, light, overlay);
                 ms.popPose();
             }

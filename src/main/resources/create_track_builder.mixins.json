@@ -5,8 +5,13 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "createtrackbuilder.refmap.json",
   "mixins": [
+    "MixinSchematicannonBE",
+    "MixinSCInventory",
     "accessor.FilteringBehaviourAccessor",
-    "accessor.PlacementInfoAccessor"
+    "accessor.PaletteInvoker",
+    "accessor.PlacementInfoAccessor",
+    "accessor.SchematicPrinterAccessor",
+    "accessor.StructureTemplateAccessor"
   ],
   "client": [
   ],

@@ -27,7 +27,7 @@ public class CreateTrackBuilder {
             PROTOCOL_VERSION::equals
     );
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public CreateTrackBuilder(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();

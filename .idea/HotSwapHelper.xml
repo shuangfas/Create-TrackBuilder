@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="HotSwapHelperPluginSettingsProvider">
+    <option name="agentPath" value="D:\Minecraft\jdk\jbr_jcef-17.0.11-windows-x64-b1312.2\lib\hotswap\hotswap-agent.jar" />
+    <option name="disabledPlugins">
+      <set>
+        <option value="Proxy" />
+        <option value="Spring" />
+        <option value="Springboot" />
+      </set>
+    </option>
+  </component>
+</project>

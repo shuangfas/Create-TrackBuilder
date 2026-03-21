@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.foundation.util;
+package org.shuangfa114.test.createtrackbuilder.foundation.blockEntity.behaviour;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
@@ -22,7 +22,7 @@ public class BuilderTransform extends ValueBoxTransform {
     @Override
     public Vec3 getLocalOffset(LevelAccessor level, BlockPos pos, BlockState state) {
         float stateAngle = AngleHelper.horizontalAngle(getDirection(state));
-        return VecHelper.rotateCentered(VecHelper.voxelSpace(8 + offset, 16f, 7), stateAngle, Direction.Axis.Y);
+        return VecHelper.rotateCentered(VecHelper.voxelSpace(8 , 16f, 8+ offset), stateAngle, Direction.Axis.Y);
     }
 
     @Override

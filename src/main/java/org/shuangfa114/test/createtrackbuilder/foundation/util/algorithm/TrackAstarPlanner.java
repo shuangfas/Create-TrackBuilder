@@ -4,6 +4,7 @@ import com.simibubi.create.content.trains.track.TrackShape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.Util;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
 
 import java.util.*;
 

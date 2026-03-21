@@ -32,7 +32,7 @@ public class MultiFilterBehaviour extends FilteringBehaviour {
     public List<FilteringBehaviour> filters;
 
     public MultiFilterBehaviour(SmartBlockEntity be) {
-        super(be, new VoidTransform());
+        super(be, new PlaceHolderTransform());
         filters = new LinkedList<>();
     }
 
