@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.foundation.util.api;
+package org.shuangfa114.test.createtrackbuilder.api;
 
 import com.simibubi.create.content.schematics.SchematicPrinter;
 import net.createmod.catnip.levelWrappers.SchematicLevel;
@@ -11,8 +11,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.shuangfa114.test.createtrackbuilder.content.block.builder.BuilderBlockEntity;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.StructureHelper;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
-import org.shuangfa114.test.createtrackbuilder.mixin.accessor.SchematicPrinterAccessor;
+import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
+import org.shuangfa114.test.createtrackbuilder.foundation.mixin.accessor.SchematicPrinterAccessor;
 
 public class TrackPrinter extends SchematicPrinter {
     public int currentIndex;
@@ -80,6 +80,11 @@ public class TrackPrinter extends SchematicPrinter {
             accessor.setSchematicAnchor(posToPlace);
             accessor.setSchematicLoaded(true);
         }
+    }
+
+    @Override
+    public void handleCurrentTarget(BlockTargetHandler blockHandler, EntityTargetHandler entityHandler) {
+        super.handleCurrentTarget(blockHandler, entityHandler);
     }
 
     @Override

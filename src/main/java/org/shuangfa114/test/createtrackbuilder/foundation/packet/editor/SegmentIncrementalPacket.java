@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
 import org.shuangfa114.test.createtrackbuilder.foundation.packet.NetworkUtil;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
+import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
 
 public class SegmentIncrementalPacket extends SimplePacketBase {
     public Segment segment;

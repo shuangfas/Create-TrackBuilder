@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import org.shuangfa114.test.createtrackbuilder.ModPackets;
 import org.shuangfa114.test.createtrackbuilder.foundation.packet.builder.TrackPlacePacket;
+import org.shuangfa114.test.createtrackbuilder.foundation.util.ModLang;
 
 public class BuilderScreen extends AbstractSimiContainerScreen<BuilderMenu> {
     public static final AllGuiTextures BG_BOTTOM = AllGuiTextures.SCHEMATICANNON_BOTTOM;
@@ -29,6 +30,9 @@ public class BuilderScreen extends AbstractSimiContainerScreen<BuilderMenu> {
 
         int x = leftPos;
         int y = topPos;
+        pGuiGraphics.drawString(font, ModLang.translateDirect("gui.builder.state" + blockEntity.state.toString()),
+                x + width / 2, y + 50,
+                blockEntity.state.valid ? 808080 : 0x990000);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.mixin.accessor;
+package org.shuangfa114.test.createtrackbuilder.foundation.mixin.accessor;
 
 import com.simibubi.create.content.trains.track.TrackPlacement;
 import net.minecraft.core.BlockPos;

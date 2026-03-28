@@ -151,6 +151,9 @@ repositories {
     }
     maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
     maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
+    maven {
+        url "https://cursemaven.com"
+    }
 
 }
 
@@ -170,8 +173,12 @@ dependencies {
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.3")) {
         jarJar.ranged(it, "[0.5.3,)")
     }
-    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:15.20.0.129")
-    runtimeOnly fg.deobf("maven.modrinth:spark:4FXHDE9F")
+    implementation fg.deobf("maven.modrinth:xaeros-world-map:vUbAYOnm")
+    implementation fg.deobf("maven.modrinth:xaeros-minimap:iMXAV165")
+    compileOnly fg.deobf(files('lib/xaerolib-forge-1.20.1-1.1.0.jar'))
+
+    //runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:15.20.0.129")
+    //runtimeOnly fg.deobf("maven.modrinth:spark:4FXHDE9F")
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

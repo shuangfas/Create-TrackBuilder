@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.mixin.accessor;
+package org.shuangfa114.test.createtrackbuilder.foundation.mixin.accessor;
 
 import com.simibubi.create.content.schematics.SchematicPrinter;
 import net.createmod.catnip.levelWrappers.SchematicLevel;

@@ -33,8 +33,8 @@ import org.shuangfa114.test.createtrackbuilder.foundation.blockEntity.behaviour.
 import org.shuangfa114.test.createtrackbuilder.foundation.util.ModLang;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.StructureHelper;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.TrackPreview;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.api.TrackPrinter;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
+import org.shuangfa114.test.createtrackbuilder.api.TrackPrinter;
+import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -148,10 +148,6 @@ public class BuilderBlockEntity extends KineticBlockEntity implements MenuProvid
 
     public void saveAndTransmit() {
         CompoundTag tag = inventory.getStackInSlot(0).getTag();
-        if (!tag.getBoolean("Initialized")) {
-            state = State.NOT_INIT;
-            return;
-        }
         List<Segment> segments = Segment.tagToList(tag);
         state = saveTemplate(segments);
         if (state == State.VALID) {
@@ -199,6 +195,8 @@ public class BuilderBlockEntity extends KineticBlockEntity implements MenuProvid
             printer.controller = this.getBlockPos();
             attachedCannon.printer = printer;
             attachedCannon.state=SchematicannonBlockEntity.State.RUNNING;
+            attachedCannon.notifyUpdate();
+            return State.VALID;
         }
         return State.FIND_NOT_CANNON;
     }

@@ -23,9 +23,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
+import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.client.EditorHandler;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.TrackPreview;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
 
 public abstract class EditorToolBase implements IEditorTool {
     private static final ItemStack indicator = new ItemStack(AllItems.BRASS_HAND);
@@ -134,9 +134,7 @@ public abstract class EditorToolBase implements IEditorTool {
                     .lineWidth(1 / 16f);
             lastSeg = seg;
         }
-        if (handler.isInitialized()) {
-            TrackPreview.clientTick(handler.segments);
-        }
+        TrackPreview.clientTick(handler.segments);
     }
 
     public boolean shouldShowSelection() {

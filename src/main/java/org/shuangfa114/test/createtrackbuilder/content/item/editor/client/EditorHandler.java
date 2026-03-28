@@ -12,30 +12,33 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.shuangfa114.test.createtrackbuilder.ModPackets;
+import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.client.tools.EditorToolType;
 import org.shuangfa114.test.createtrackbuilder.foundation.packet.editor.OwnerSettingPacket;
+import org.shuangfa114.test.createtrackbuilder.foundation.packet.editor.SegmentIncrementalPacket;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.TrackPreview;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
 
 import java.util.LinkedList;
 import java.util.List;
 
 //I'm king of copying and pasting!!!!
 public class EditorHandler {
-    private static final int SYNC_DELAY = 10;
     public List<Segment> segments;
     private ToolSelectionScreen selectionScreen;
-    private boolean initialized;
     private boolean active;
     private EditorToolType currentTool;
     private int activeHotbarSlot;
     private ItemStack activeEditorItem;
 
     public EditorHandler() {
-        currentTool = EditorToolType.SELECTION_INIT;
-        selectionScreen = new ToolSelectionScreen(ImmutableList.of(EditorToolType.SELECTION_INIT), this::equip);
+        currentTool = EditorToolType.SELECTION_ADD;
+        selectionScreen = new ToolSelectionScreen(ImmutableList.of(EditorToolType.SELECTION_ADD), this::equip);
         segments = new LinkedList<>();
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
     public void tick() {
@@ -83,15 +86,12 @@ public class EditorHandler {
         active = true;
         load(stack);
         sync(new OwnerSettingPacket(activeHotbarSlot, player.getGameProfile().getName()));
-        if (initialized) {
-            EditorToolType toolBefore = currentTool;
-            selectionScreen = new ToolSelectionScreen(EditorToolType.getTools(player.isCreative()), this::equip);
-            if (toolBefore != null && EditorToolType.getTools(player.isCreative()).contains(toolBefore)) {
-                selectionScreen.setSelectedElement(toolBefore);
-                equip(toolBefore);
-            }
-        } else
-            selectionScreen = new ToolSelectionScreen(EditorToolType.getToolsBeforeInit(), this::equip);
+        EditorToolType toolBefore = currentTool;
+        selectionScreen = new ToolSelectionScreen(EditorToolType.getTools(), this::equip);
+        if (toolBefore != null) {
+            selectionScreen.setSelectedElement(toolBefore);
+            equip(toolBefore);
+        }
     }
 
     public boolean onMouseInput(int button, boolean pressed) {
@@ -145,13 +145,6 @@ public class EditorHandler {
                 .init();
     }
 
-    public void deploy() {
-        if (!initialized) {
-            selectionScreen = new ToolSelectionScreen(EditorToolType.getTools(Minecraft.getInstance().player.isCreative()), this::equip);
-        }
-        initialized = true;
-    }
-
     private ItemStack findEditorInHand(Player player) {
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof TrackEditor))
@@ -172,10 +165,10 @@ public class EditorHandler {
 
     public void load(ItemStack stack) {
         segments = Segment.tagToList(stack.getOrCreateTag());
-        initialized = stack.getOrCreateTag().getBoolean("Initialized");
     }
 
-    public boolean isInitialized() {
-        return initialized;
+    public void addSegment(Segment segment) {
+        segments.add(segment);
+        sync(new SegmentIncrementalPacket(segment, activeHotbarSlot));
     }
 }

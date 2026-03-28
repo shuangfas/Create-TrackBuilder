@@ -8,7 +8,7 @@ import org.shuangfa114.test.createtrackbuilder.foundation.packet.editor.SegmentI
 import org.shuangfa114.test.createtrackbuilder.foundation.util.ModLang;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.TrackPreview;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.Util;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
+import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
 
 import java.util.Optional;
 

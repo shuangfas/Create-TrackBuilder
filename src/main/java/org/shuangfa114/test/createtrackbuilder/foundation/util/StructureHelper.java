@@ -17,9 +17,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilder;
-import org.shuangfa114.test.createtrackbuilder.mixin.accessor.PaletteInvoker;
-import org.shuangfa114.test.createtrackbuilder.mixin.accessor.StructureTemplateAccessor;
+import org.shuangfa114.test.createtrackbuilder.foundation.mixin.accessor.PaletteInvoker;
+import org.shuangfa114.test.createtrackbuilder.foundation.mixin.accessor.StructureTemplateAccessor;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -81,7 +80,7 @@ public class StructureHelper {
             }
             return new SchematicExport.SchematicExportResult(file, dir, fileName, overwritten, null, null);
         } catch (IOException e) {
-            CreateTrackBuilder.LOGGER.error("An error occurred while saving schematic [{}]", fileName, e);
+            System.out.print("An error occurred while saving schematic " + fileName + e);
             return null;
         }
     }
@@ -93,7 +92,7 @@ public class StructureHelper {
             CompoundTag nbt = NbtIo.read(stream, new NbtAccounter(0x20000000L));
             t.load(level.holderLookup(Registries.BLOCK), nbt);
         } catch (IOException e) {
-            CreateTrackBuilder.LOGGER.warn("Failed to read schematic", e);
+            System.out.print("Failed to read schematic" + e);
         }
         return t;
     }
@@ -107,7 +106,7 @@ public class StructureHelper {
         try {
             t.placeInWorld(blockReader, anchor, anchor, new StructurePlaceSettings(), blockReader.getRandom(), Block.UPDATE_CLIENTS);
         } catch (Exception e) {
-            CreateTrackBuilder.LOGGER.error("Failed to load Schematic for Printing", e);
+            System.out.print("Failed to load Schematic for Printing" + e);
         }
         BlockPos extraBounds = StructureTemplate.calculateRelativePosition(new StructurePlaceSettings(), new BlockPos(t.getSize())
                 .offset(-1, -1, -1));

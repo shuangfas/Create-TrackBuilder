@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.mixin.accessor;
+package org.shuangfa114.test.createtrackbuilder.foundation.mixin.accessor;
 
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.spongepowered.asm.mixin.Mixin;

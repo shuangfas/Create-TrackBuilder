@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.foundation.util.structures;
+package org.shuangfa114.test.createtrackbuilder.api.structures;
 
 import com.simibubi.create.content.trains.track.TrackShape;
 import net.minecraft.core.BlockPos;

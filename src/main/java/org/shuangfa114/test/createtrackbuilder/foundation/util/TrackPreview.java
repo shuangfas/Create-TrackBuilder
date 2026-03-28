@@ -26,8 +26,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.SegmentEdge;
+import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
+import org.shuangfa114.test.createtrackbuilder.api.structures.SegmentEdge;
 
 import java.util.*;
 
@@ -363,6 +363,9 @@ public class TrackPreview {
         for (int j = 0; j < segments.size() - 1; j++) {
             Segment start = segments.get(j);
             Segment end = segments.get(j + 1);
+            if(start.shape == TrackShape.NONE||end.shape == TrackShape.NONE) {
+                continue;
+            }
             SegmentEdge edge = SegmentEdge.of(start, end);
             Level level = player.level();
             PlacementInfo info = caches.computeIfAbsent(edge, (key) -> tryConnect(level, start, end, true));

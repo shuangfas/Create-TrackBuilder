@@ -10,14 +10,12 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import org.shuangfa114.test.createtrackbuilder.foundation.packet.builder.TrackPlacePacket;
 import org.shuangfa114.test.createtrackbuilder.foundation.packet.editor.OwnerSettingPacket;
 import org.shuangfa114.test.createtrackbuilder.foundation.packet.editor.SegmentIncrementalPacket;
-import org.shuangfa114.test.createtrackbuilder.foundation.packet.editor.SegmentInitPacket;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public enum ModPackets {
-    SEGMENT_INIT(SegmentInitPacket.class, SegmentInitPacket::new, NetworkDirection.PLAY_TO_SERVER),
     SEGMENT_INCREMENTAL(SegmentIncrementalPacket.class, SegmentIncrementalPacket::new, NetworkDirection.PLAY_TO_SERVER),
     TRACK_PLACE(TrackPlacePacket.class, TrackPlacePacket::new, NetworkDirection.PLAY_TO_SERVER),
     OWNER_SETTING(OwnerSettingPacket.class, OwnerSettingPacket::new, NetworkDirection.PLAY_TO_SERVER),

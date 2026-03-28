@@ -1,4 +1,4 @@
-package org.shuangfa114.test.createtrackbuilder.foundation.util.structures;
+package org.shuangfa114.test.createtrackbuilder.api.structures;
 
 public class SegmentEdge {
     public Segment first;

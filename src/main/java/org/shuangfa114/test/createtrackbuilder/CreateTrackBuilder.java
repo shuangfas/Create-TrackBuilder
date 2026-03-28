@@ -1,6 +1,5 @@
 package org.shuangfa114.test.createtrackbuilder;
 
-import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -10,6 +9,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import static org.antlr.runtime.debug.DebugEventListener.PROTOCOL_VERSION;
 
@@ -26,8 +27,8 @@ public class CreateTrackBuilder {
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
     );
-    // Directly reference a slf4j logger
-    public static final Logger LOGGER = LogUtils.getLogger();
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(CreateTrackBuilder.MODID);
 
     public CreateTrackBuilder(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();

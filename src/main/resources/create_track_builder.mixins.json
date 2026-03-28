@@ -1,19 +1,21 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "org.shuangfa114.test.createtrackbuilder.mixin",
+  "package": "org.shuangfa114.test.createtrackbuilder.foundation.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "createtrackbuilder.refmap.json",
   "mixins": [
-    "MixinSchematicannonBE",
-    "MixinSCInventory",
     "accessor.FilteringBehaviourAccessor",
     "accessor.PaletteInvoker",
     "accessor.PlacementInfoAccessor",
     "accessor.SchematicPrinterAccessor",
-    "accessor.StructureTemplateAccessor"
+    "accessor.StructureTemplateAccessor",
+    "create.MixinSchematicannonBE",
+    "create.MixinSCInventory",
+    "create.MixinTrackBlockEntity"
   ],
   "client": [
+    "compat.xaero.MixinGuiMap"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -4,7 +4,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
-import org.shuangfa114.test.createtrackbuilder.foundation.util.structures.Segment;
 
 public class BuilderInventory extends ItemStackHandler {
     public BuilderBlockEntity blockEntity;
