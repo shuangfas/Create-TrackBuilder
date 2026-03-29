@@ -15,10 +15,10 @@ import net.minecraft.network.chat.Component;
 import org.joml.Vector2d;
 import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
 import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
+import org.shuangfa114.test.createtrackbuilder.foundation.compat.xaero.MapCompatClient;
 import org.shuangfa114.test.createtrackbuilder.foundation.compat.xaero.TrackPreviewMap;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.ModLang;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.Util;
-import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -35,8 +35,6 @@ import xaero.map.gui.ScreenBase;
 
 @Mixin(value = GuiMap.class, remap = false)
 public abstract class MixinGuiMap extends ScreenBase implements IRightClickableElement {
-    @Unique
-    private boolean editing = false;
     @Unique
     private byte intervalCounter = 0;
     @Unique
@@ -68,7 +66,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V", ordinal = 3))
     private void renderText(GuiGraphics guiGraphics, int scaledMouseX, int scaledMouseY, float partialTicks, CallbackInfo ci, @Local(ordinal = 4) VertexConsumer backgroundVertexBuffer) {
-        if (editing) {
+        if (MapCompatClient.isEditing) {
             Component component = ModLang.translateDirect("gui.map.editing");
             MapRenderHelper.drawCenteredStringWithBackground(guiGraphics, font, component, this.width / 2, this.height - 25, -1, 0, 0, 0, 0.3f, backgroundVertexBuffer);
         }
@@ -77,8 +75,8 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIIIII)V"))
     private void renderCurve(GuiGraphics guiGraphics, int scaledMouseX, int scaledMouseY, float partialTicks, CallbackInfo ci, @Local PoseStack matrixStack) {
         GuiMap map = (GuiMap) (Object) this;
-        if (editing) {
-            TrackPreviewMap.renderSegments(guiGraphics, map, partialTicks);
+        if (MapCompatClient.isEditing) {
+            //TrackPreviewMap.renderSegments(guiGraphics, map, partialTicks);
             if (doubleClickedPos!=null) {
                 Vector2d vector2d = new Vector2d(mouseBlockPosX - doubleClickedPos.getX(), mouseBlockPosZ - doubleClickedPos.getZ());
                 currentShape = Util.getBestShape(vector2d);
@@ -89,7 +87,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Inject(method = "mapClicked", at = @At("HEAD"))
     private void onClick(int button, int x, int y, CallbackInfo ci) {
-        if (editing) {
+        if (MapCompatClient.isEditing) {
             if (doubleClickedPos != null && currentShape != TrackShape.NONE) {
                 CreateTrackBuilderClient.editorHandler.addSegment(new Segment(doubleClickedPos, currentShape));
                 reset();
@@ -111,8 +109,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Unique
     private void onEditBotton(Button button) {
-        setFocused(!editing);
-        editing = !editing;
+        MapCompatClient.isEditing =!MapCompatClient.isEditing;
     }
 
     @Unique

@@ -15,7 +15,8 @@
     "create.MixinTrackBlockEntity"
   ],
   "client": [
-    "compat.xaero.MixinGuiMap"
+    "compat.xaero.MixinGuiMap",
+    "compat.xaero.MixinMapElementRenderHandler"
   ],
   "injectors": {
     "defaultRequire": 1
