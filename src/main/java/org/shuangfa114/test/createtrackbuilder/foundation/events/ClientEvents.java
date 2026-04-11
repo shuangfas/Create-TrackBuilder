@@ -21,7 +21,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilder;
-import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
+import org.shuangfa114.test.createtrackbuilder.ModClient;
 import org.shuangfa114.test.createtrackbuilder.foundation.blockEntity.behaviour.MultiFilterRender;
 
 @Mod.EventBusSubscriber(modid = CreateTrackBuilder.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -43,7 +43,7 @@ public class ClientEvents {
             return;
         }
         MultiFilterRender.tick();
-        CreateTrackBuilderClient.editorHandler.tick();
+        ModClient.editorHandler.tick();
     }
 
     @SubscribeEvent
@@ -60,7 +60,7 @@ public class ClientEvents {
         ms.pushPose();
         SuperRenderTypeBuffer buffer = DefaultSuperRenderTypeBuffer.getInstance();
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        CreateTrackBuilderClient.editorHandler.render(ms, buffer, camera);
+        ModClient.editorHandler.render(ms, buffer, camera);
         buffer.draw();
         RenderSystem.enableCull();
         ms.popPose();
@@ -70,7 +70,7 @@ public class ClientEvents {
     public static void onOverlayRender(RenderGuiOverlayEvent event) {
         if(event.getOverlay().overlay() instanceof SchematicHandler){//指定一个overlay，不然会重复渲染
             Window window = event.getWindow();
-            CreateTrackBuilderClient.editorHandler.renderGui(event.getGuiGraphics(), event.getPartialTick()
+            ModClient.editorHandler.renderGui(event.getGuiGraphics(), event.getPartialTick()
                     , window.getGuiScaledWidth()
                     , window.getGuiScaledHeight());
         }

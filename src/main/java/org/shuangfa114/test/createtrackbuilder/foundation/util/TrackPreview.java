@@ -25,9 +25,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
-import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
 import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
 import org.shuangfa114.test.createtrackbuilder.api.structures.SegmentEdge;
+import org.shuangfa114.test.createtrackbuilder.content.item.editor.TrackEditor;
 
 import java.util.*;
 
@@ -61,7 +61,7 @@ public class TrackPreview {
         Vec3 axis1 = startAxis;
         Vec3 axis2 = endAxis;
         Vec3 normal1 = getUpNormal().normalize();
-        Vec3 normal2 = getUpNormal().normalize();
+        Vec3 normal2 = normal1;
         Vec3 normedAxis1 = axis1.normalize();
         Vec3 normedAxis2 = axis2.normalize();
         Vec3 end1 = getCurveStart(start.pos, axis1);
@@ -317,7 +317,7 @@ public class TrackPreview {
                 Vec3 offset = axis.scale(i);
                 BlockPos offsetPos = pos.offset(BlockPos.containing(offset));
                 info.requiredTracks++;
-                if (!inSchematic||!schematicLevel.getBlockState(offsetPos).canBeReplaced()) {
+                if (!inSchematic || !schematicLevel.getBlockState(offsetPos).canBeReplaced()) {
                     continue;
                 }
                 schematicLevel.setBlock(offsetPos, toPlace, 3);
@@ -363,7 +363,7 @@ public class TrackPreview {
         for (int j = 0; j < segments.size() - 1; j++) {
             Segment start = segments.get(j);
             Segment end = segments.get(j + 1);
-            if(start.shape == TrackShape.NONE||end.shape == TrackShape.NONE) {
+            if (start.shape == TrackShape.NONE || end.shape == TrackShape.NONE) {
                 continue;
             }
             SegmentEdge edge = SegmentEdge.of(start, end);
@@ -415,47 +415,18 @@ public class TrackPreview {
             BezierConnection bc = info.curve;
             if (bc == null)
                 continue;
-
-            Vec3 previous1 = null;
-            Vec3 previous2 = null;
-            int segCount = bc.getSegmentCount();
-
             Vec3 end1 = bc.starts.getFirst();
             Vec3 end2 = bc.starts.getSecond();
-            Vec3 finish1 = end1.add(bc.axes.getFirst()
-                    .scale(bc.getHandleLength()));
-            Vec3 finish2 = end2.add(bc.axes.getSecond()
-                    .scale(bc.getHandleLength()));
             String key = "curve" + end1.hashCode() + end2.hashCode();
-
-            for (int i = 0; i <= segCount; i += 2) {//origin is i++
-                float t = i / (float) segCount;
-                Vec3 result = VecHelper.bezier(end1, end2, finish1, finish2, t);
-                Vec3 derivative = VecHelper.bezierDerivative(end1, end2, finish1, finish2, t)
-                        .normalize();
-                Vec3 normal = bc.getNormal(t)
-                        .cross(derivative)
-                        .scale(15 / 16f);
-                Vec3 rail1 = result.add(normal)
-                        .add(up);
-                Vec3 rail2 = result.subtract(normal)
-                        .add(up);
-
-                if (previous1 != null) {
+            for (boolean left : Iterate.trueAndFalse) {
+                ArrayList<Vec3> vec3s = calculateCurvePoints(bc, left);
+                for (int i = 0; i < vec3s.size() - 1; i += 2) {
                     Outliner.getInstance()
-                            .showLine(Pair.of(key, i * 2), previous1, rail1)
-                            .colored(color)
-                            .disableLineNormals()
-                            .lineWidth(1 / 16f);
-                    Outliner.getInstance()
-                            .showLine(Pair.of(key, i * 2 + 1), previous2, rail2)
+                            .showLine(key + i * 2 + (left ? 0 : 1), vec3s.get(i), vec3s.get(i + 1))
                             .colored(color)
                             .disableLineNormals()
                             .lineWidth(1 / 16f);
                 }
-
-                previous1 = rail1;
-                previous2 = rail2;
             }
 
 //            for (int i = segCount + 1; i <= lastLineCount; i++) {
@@ -477,12 +448,37 @@ public class TrackPreview {
         caches.replace(origin, tryConnect(Minecraft.getInstance().level, target.first, target.second, true));
     }
 
+    public static ArrayList<Vec3> calculateCurvePoints(BezierConnection bc, boolean left) {
+        Vec3 up = new Vec3(0, 4 / 16f, 0);
+        Vec3 previous;
+        int segCount = bc.getSegmentCount();
+        Vec3 end1 = bc.starts.getFirst();
+        Vec3 end2 = bc.starts.getSecond();
+        Vec3 finish1 = end1.add(bc.axes.getFirst()
+                .scale(bc.getHandleLength()));
+        Vec3 finish2 = end2.add(bc.axes.getSecond()
+                .scale(bc.getHandleLength()));
+        ArrayList<Vec3> results = new ArrayList<>();
+        for (int i = 0; i <= segCount; i++) {
+            float t = i / (float) segCount;
+            Vec3 result = VecHelper.bezier(end1, end2, finish1, finish2, t);
+            Vec3 derivative = VecHelper.bezierDerivative(end1, end2, finish1, finish2, t)
+                    .normalize();
+            Vec3 normal = bc.getNormal(t)
+                    .cross(derivative)
+                    .scale(15 / 16f);
+            previous = result.add(normal.scale(left ? 1 : -1)).add(up);
+            results.add(previous);
+        }
+        return results;
+    }
+
     public static void clearCaches() {
         caches.clear();
     }
 
     @OnlyIn(Dist.CLIENT)
-    private static void line(int id, Vec3 v1, Vec3 o1, Vec3 ex, int color) {
+    public static void line(int id, Vec3 v1, Vec3 o1, Vec3 ex, int color) {
         Outliner.getInstance().showLine(Pair.of("start", id), v1.subtract(o1), v1.add(ex))
                 .lineWidth(1 / 8f)
                 .disableLineNormals()
@@ -515,9 +511,9 @@ public class TrackPreview {
         public Segment start;
         public Segment end;
         public boolean valid = false;
-        BezierConnection curve = null;
-        int end1Extent = 0;
-        int end2Extent = 0;
+        public BezierConnection curve = null;
+        public int end1Extent = 0;
+        public int end2Extent = 0;
         String message = null;
 
         public PlacementInfo(ItemStack itemStack) {

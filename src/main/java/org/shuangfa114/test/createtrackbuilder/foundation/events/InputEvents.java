@@ -6,7 +6,7 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilder;
-import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
+import org.shuangfa114.test.createtrackbuilder.ModClient;
 
 @Mod.EventBusSubscriber(modid = CreateTrackBuilder.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class InputEvents {
@@ -16,7 +16,7 @@ public class InputEvents {
             return;
         int button = event.getButton();
         boolean pressed = !(event.getAction() == 0);
-        if (CreateTrackBuilderClient.editorHandler.onMouseInput(button, pressed))
+        if (ModClient.editorHandler.onMouseInput(button, pressed))
             event.setCanceled(true);
     }
     @SubscribeEvent
@@ -25,7 +25,7 @@ public class InputEvents {
             return;
 
         double delta = event.getScrollDelta();
-        if(CreateTrackBuilderClient.editorHandler.mouseScrolled(delta)){
+        if(ModClient.editorHandler.mouseScrolled(delta)){
             event.setCanceled(true);
         }
     }
@@ -37,6 +37,6 @@ public class InputEvents {
         int key = event.getKey();
         boolean pressed = !(event.getAction() == 0);
 
-        CreateTrackBuilderClient.editorHandler.onKeyInput(key, pressed);
+        ModClient.editorHandler.onKeyInput(key, pressed);
     }
 }

@@ -1,18 +1,15 @@
 package org.shuangfa114.test.createtrackbuilder.foundation.compat.xaero.element;
 
-import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
-import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
+import org.shuangfa114.test.createtrackbuilder.ModClient;
 import xaero.map.element.MapElementRenderProvider;
 import xaero.map.element.render.ElementRenderLocation;
 
-import java.util.Iterator;
-
-public class SegmentRenderProvider extends MapElementRenderProvider<Segment, SegmentRenderContext> {
-    private Iterator<Segment> iterator;
+public class SegmentRenderProvider extends MapElementRenderProvider<SegmentIterator, SegmentRenderContext> {
+    private SegmentIterator iterator;
 
     @Override
     public void begin(ElementRenderLocation location, SegmentRenderContext context) {
-        iterator = CreateTrackBuilderClient.editorHandler.segments.iterator();
+        iterator = new SegmentIterator(ModClient.getSegments());
     }
 
     @Override
@@ -21,14 +18,16 @@ public class SegmentRenderProvider extends MapElementRenderProvider<Segment, Seg
     }
 
     @Override
-    public Segment getNext(ElementRenderLocation location, SegmentRenderContext context) {
-        return iterator.next();
+    public SegmentIterator getNext(ElementRenderLocation location, SegmentRenderContext context) {
+        iterator.next();
+        return iterator;
     }
 
     @Override
-    public Segment setupContextAndGetNext(ElementRenderLocation location, SegmentRenderContext context) {
+    public SegmentIterator setupContextAndGetNext(ElementRenderLocation location, SegmentRenderContext context) {
         return getNext(location, context);
     }
+
     //————————————————————
     @Override
     public void end(int i, SegmentRenderContext segmentRenderContext) {
@@ -46,7 +45,7 @@ public class SegmentRenderProvider extends MapElementRenderProvider<Segment, Seg
     }
 
     @Override
-    public Segment getNext(int i, SegmentRenderContext segmentRenderContext) {
+    public SegmentIterator getNext(int i, SegmentRenderContext segmentRenderContext) {
         return null;
     }
 }

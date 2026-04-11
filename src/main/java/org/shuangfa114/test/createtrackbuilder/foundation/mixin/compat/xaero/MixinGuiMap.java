@@ -13,10 +13,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import org.joml.Vector2d;
-import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
+import org.shuangfa114.test.createtrackbuilder.ModClient;
 import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
+import org.shuangfa114.test.createtrackbuilder.foundation.compat.xaero.CurveRenderer;
 import org.shuangfa114.test.createtrackbuilder.foundation.compat.xaero.MapCompatClient;
-import org.shuangfa114.test.createtrackbuilder.foundation.compat.xaero.TrackPreviewMap;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.ModLang;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.Util;
 import org.spongepowered.asm.mixin.Mixin;
@@ -60,7 +60,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     private void addEditingButton(CallbackInfo ci) {
         Button editingModeButton = new GuiTexturedButton(width - 20, height - 180, 20, 20, 165, 0, 16, 16,
                 WorldMap.guiTextures, this::onEditBotton, () -> new Tooltip("switch"));
-        editingModeButton.visible = CreateTrackBuilderClient.editorHandler.isActive();
+        editingModeButton.visible = ModClient.editorHandler.isActive();
         addButton(editingModeButton);
     }
 
@@ -76,20 +76,15 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
     private void renderCurve(GuiGraphics guiGraphics, int scaledMouseX, int scaledMouseY, float partialTicks, CallbackInfo ci, @Local PoseStack matrixStack) {
         GuiMap map = (GuiMap) (Object) this;
         if (MapCompatClient.isEditing) {
-            //TrackPreviewMap.renderSegments(guiGraphics, map, partialTicks);
-            if (doubleClickedPos!=null) {
-                Vector2d vector2d = new Vector2d(mouseBlockPosX - doubleClickedPos.getX(), mouseBlockPosZ - doubleClickedPos.getZ());
-                currentShape = Util.getBestShape(vector2d);
-                TrackPreviewMap.renderDirection(guiGraphics, map,doubleClickedPos, Util.getAxisV2(currentShape), partialTicks);
-            }
+            CurveRenderer.prepareAndRender(guiGraphics,map,partialTicks);
         }
     }
 
     @Inject(method = "mapClicked", at = @At("HEAD"))
     private void onClick(int button, int x, int y, CallbackInfo ci) {
         if (MapCompatClient.isEditing) {
-            if (doubleClickedPos != null && currentShape != TrackShape.NONE) {
-                CreateTrackBuilderClient.editorHandler.addSegment(new Segment(doubleClickedPos, currentShape));
+            if (doubleClickedPos != null) {
+                ModClient.editorHandler.addSegment(new Segment(doubleClickedPos, currentShape));
                 reset();
             }
             if (intervalCounter >= 0) {
@@ -109,7 +104,7 @@ public abstract class MixinGuiMap extends ScreenBase implements IRightClickableE
 
     @Unique
     private void onEditBotton(Button button) {
-        MapCompatClient.isEditing =!MapCompatClient.isEditing;
+        MapCompatClient.isEditing = !MapCompatClient.isEditing;
     }
 
     @Unique

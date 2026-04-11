@@ -5,7 +5,7 @@ import xaero.map.graphics.renderer.multitexture.MultiTextureRenderTypeRenderer;
 
 public class SegmentRenderContext {
     public VertexConsumer regularUIObjectConsumer;
-    public VertexConsumer textBGConsumer;
+    public VertexConsumer colorConsumer;
     public MultiTextureRenderTypeRenderer uniqueTextureUIObjectRenderer;
     public SegmentRenderContext() {}
 }

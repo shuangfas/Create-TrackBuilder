@@ -22,7 +22,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.shuangfa114.test.createtrackbuilder.CreateTrackBuilderClient;
+import org.shuangfa114.test.createtrackbuilder.ModClient;
 import org.shuangfa114.test.createtrackbuilder.api.structures.Segment;
 import org.shuangfa114.test.createtrackbuilder.content.item.editor.client.EditorHandler;
 import org.shuangfa114.test.createtrackbuilder.foundation.util.TrackPreview;
@@ -39,7 +39,7 @@ public abstract class EditorToolBase implements IEditorTool {
 
     @Override
     public void init() {
-        handler = CreateTrackBuilderClient.editorHandler;
+        handler = ModClient.editorHandler;
     }
 
     @Override

@@ -44,9 +44,7 @@ public class Util {
         return TrackShape.NONE;
     }
 
-    /**
-     * @param vec2 y always = 0
-     */
+
     public static TrackShape getBestShape(Vector2d vec2) {
         if (Mth.equal(vec2.length(), 0))
             return TrackShape.ZO;
@@ -87,4 +85,5 @@ public class Util {
                         }));
 
     }
+
 }
